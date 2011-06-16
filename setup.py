@@ -18,8 +18,7 @@ Program for accessing TikTak through the command-line""",
       include_package_data=True,
       zip_safe=True,
       install_requires=[
-          'restkit>=3.2.1',
-          'opts>=0.1.1',
+          'restkit>=3.2.1'
       ],
       entry_points={
           'console_scripts': [
