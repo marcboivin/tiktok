@@ -1,6 +1,3 @@
 
-
-__all__ = [
-    'widget',
-    'task',
-]
+import widget
+import task

@@ -1,39 +1,30 @@
 from tiktok.model.task import Task
+from tiktok.lib.resources import resource
 import pprint
 
-def process_command( resource, info ):
+def show( args ):
 
     task = Task( resource )
-    command, (opts, args) = info
+    task_id = int(args[0])
+    pprint.pprint( task.show( task_id ) )
 
-    if command == 'show':
 
-        if len(args) == 0:
-            print "ERROR: please give a task number"
-            sys.exit(1)
-        task_id = int(args[0])
+def start( args ):
 
-        pprint.pprint( task.show( task_id ) )
+    task = Task( resource )
+    task_id = int(args[0])
+    task.start( task_id )
 
-    elif command == 'start':
 
-        if len(args) == 0:
-            print "ERROR: please give a task number"
-            sys.exit(1)
-        task_id = int(args[0])
+def stop( args ):
 
-        task.start( task_id )
+    task = Task( resource )
+    task_id = int(args[0])
+    task.stop( task_id )
 
-    elif command == 'stop':
 
-        if len(args) == 0:
-            print "ERROR: please give a task number"
-            sys.exit(1)
-        task_id = int(args[0])
+def current( args ):
 
-        task.stop( task_id )
-
-    elif command == 'current':
-
-        pprint.pprint( task.current() )
+    task = Task( resource )
+    pprint.pprint( task.current() )
 
