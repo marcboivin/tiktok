@@ -49,7 +49,7 @@ def argparser():
             description = 'Start working on a task',
             #aliases = ['sta']
             )
-    start.add_argument( 'tasknum', type = int, nargs = 1 )
+    start.add_argument( 'tasknum', type = int )
 
     stop = task.add_parser(
             'stop',
@@ -77,7 +77,7 @@ def argparser():
             description = 'List of tasks inside a widget',
             #aliases = ['ta']
             )
-    tasks.add_argument('widget_id', type = int, nargs = 1 )
+    tasks.add_argument('widget_id', type = int )
 
     w_list = widget.add_parser(
             'list',
