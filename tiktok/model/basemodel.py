@@ -9,16 +9,16 @@ def set_resource( new_resource ):
     global resource
     resource = new_resource
 
-class BaseModel( object ):
+class BaseModel( dict ):
 
-    def __init__(self, resource=None):
+    def __init__(self, attributes, resource=None):
 
         resource = resource or get_resource()
         if not resource:
             raise RuntimeError("resource is null and no default resource has been initialized")
 
         self.resource = resource
+        self.update( attributes )
 
-    @classmethod
-    def format( cls, data ):
-        return cls.fmt % data
+    def format( self ):
+        return self.fmt % self
