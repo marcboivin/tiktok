@@ -2,14 +2,48 @@
 import pprint
 import sys
 import argparse
+import os.path
+
+from pkg_resources import resource_stream
+from ConfigParser import RawConfigParser
 
 from tiktok.lib.resources import init_resource
-
+from tiktok import model
 from tiktok import commands
 
-config = {
-    'url' : 'http://eric.lan.org:3000'
-}
+CONFIG_FILE = '~/.tiktok/config.cfg'
+
+def load_config( path ):
+
+    config = {}
+
+    defaults = resource_stream('tiktok.config', 'defaults.cfg')
+    parser = RawConfigParser(allow_no_value = True)
+    parser.readfp( defaults, 'defaults.cfg' )
+
+    if os.path.exists( path ):
+        parser.read( path )
+
+    sections = [ x for x in parser.sections() if x != 'general' ]
+
+    config.update( dict( parser.items('general') ) )
+    for section in sections:
+        config[section] = dict( parser.items( section ) )
+
+    return config
+
+def initialize( config ):
+
+    modules = {
+        'widget' : model.widget.Widget,
+        'task' : model.task.Task,
+    }
+
+    for (mod, obj) in modules.items():
+        obj.fmt = config[mod]['format']
+
+    init_resource( config['url'], config['username'], config['password'] )
+
 
 def dispatch( command, action, args ):
 
@@ -24,8 +58,10 @@ def argparser():
             prog='tiktok' 
             )
 
-    parser.add_argument('-u', '--username', required = True, dest='username' )
-    parser.add_argument('-p', '--password', required = True, dest='password' )
+    parser.add_argument('-c', '--config', default = CONFIG_FILE , dest='configfile')
+    parser.add_argument('-u', '--username', dest='username', default = argparse.SUPPRESS )
+    parser.add_argument('-p', '--password', dest='password', default = argparse.SUPPRESS )
+    parser.add_argument('--url', dest='url', default = argparse.SUPPRESS )
 
     commands = parser.add_subparsers(dest='command')
 
@@ -89,6 +125,7 @@ def argparser():
 
 def error(message):
     print "ERROR: ", message
+    argparser().parse_args(['--help'])
     sys.exit(1)
 
 def main():
@@ -98,17 +135,28 @@ def main():
 
     command = args.pop('command')
     action = args.pop('action')
+    configfile = os.path.expanduser( args.pop('configfile') )
+
+    config = load_config( configfile )
 
     if not command:
         error("no command found")
     if not action:
         error("no action for command")
 
-    for key in ['username', 'password']:
+    required = ['url', 'username', 'password']
+    for key in required:
         if key in args:
-            config[key] = args[key]
+            config[key] = args.pop(key)
 
-    init_resource( config['url'], config['username'], config['password'] )
+    missing = [x for x in required if not config.get(x) ]
+    if len(missing) > 0:
+        msg = "Missing arguments : %s\n" % ', '.join(missing)
+        msg += "Please add them to the config file or pass them as arguments to the command line\n"
+        error(msg)
+
+    initialize( config )
+
 
     dispatch( command, action, args )
 
