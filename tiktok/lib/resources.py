@@ -10,17 +10,6 @@ routes = {
     'dashboard' : '/activities/list',
 }
 
-resource = None
-
-def init_resource( url, username, password ):
-    global resource
-    resource = TikTakResource( url, username, password )
-    resource.login()
-
-def get_resource():
-    global resource
-    return resource
-
 class LoginError( Exception ):
 
     def __init__(self, username):
