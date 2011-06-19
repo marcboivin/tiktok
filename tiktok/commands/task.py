@@ -1,30 +1,22 @@
 from tiktok.model.task import Task
-from tiktok.lib.resources import get_resource
 import pprint
 
 def show( args ):
 
-    task = Task( get_resource() )
-    task_id = int(args[0])
-    pprint.pprint( task.show( task_id ) )
-
+    task = Task.get( args['tasknum'] )
+    pprint.pprint( task )
 
 def start( args ):
 
-    task = Task( get_resource() )
-    task_id = int(args[0])
-    task.start( task_id )
-
+    task = Task.get( args['tasknum'] )
+    task.start()
 
 def stop( args ):
 
-    task = Task( get_resource() )
-    task_id = int(args[0])
-    task.stop( task_id )
-
+    Task.stop()
 
 def current( args ):
 
-    task = Task( get_resource() )
-    pprint.pprint( task.current() )
+    task = Task.current()
+    pprint.pprint( task )
 
