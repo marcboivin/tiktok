@@ -1,38 +1,52 @@
-from basemodel import BaseModel
+from basemodel import BaseModel, get_resource
 
 class Task( BaseModel ):
 
     fmt = u"#%(task_num)d %(name)s - %(w_hour)02d:%(w_min)02d / %(d_hour)02d:%(d_min)02d"
 
     routes = {
-        'show' : '/tasks/%(tasknum)d/edit',
+        'get' : '/tasks/%(tasknum)d/edit',
         'start' : '/tasks/start_work_ajax/%(taskid)d.js',
-        'stop' : '/tasks/stop_work_ajax/%(taskid)d.js',
+        'stop' : '/tasks/stop_work_ajax',
         'current' : '/tasks/update_sheet_info',
     }
 
-    def show(self, tasknum):
-        return self.resource.getjson( self.routes['show'] % {'tasknum' : tasknum} )['task']
+    def __init__(self, *args, **kwargs):
 
-    def start(self, tasknum):
-        task = self.show( tasknum )
-        task_id = task['id']
-        self.resource.post( self.routes['start'] % {'taskid' : task_id} )
+        BaseModel.__init__(self, *args, **kwargs)
+        data = {'w_hour' : self['worked_minutes'] / 60,
+                'w_min' : self['worked_minutes'] % 60,
+                'd_hour' : self['duration'] / 60,
+                'd_min' : self['duration'] % 60 }
+        self.update(data)
 
-    def stop(self, tasknum):
-        task = self.show( tasknum )
-        task_id = task['id']
-        self.resource.post( self.routes['stop'] % {'taskid' : task_id} )
-
-    def current(self):
-        return self.resource.postjson( self.routes['current'] )['sheet']
 
     @classmethod
-    def format( cls, task ):
-        data = {'w_hour' : task['worked_minutes'] / 60,
-                'w_min' : task['worked_minutes'] % 60,
-                'd_hour' : task['duration'] / 60,
-                'd_min' : task['duration'] % 60 }
-        data.update( task )
-        return cls.fmt % data
+    def get( cls, tasknum, resource=None ):
+
+        resource = resource or get_resource()
+        return cls( resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task'] )
+
+    @classmethod
+    def current( cls, resource=None ):
+
+        resource = resource or get_resource()
+        task = None
+        data = resource.postjson( cls.routes['current'] )
+
+        if data:
+            task = cls( data['sheet'], resource )
+
+        return task
+
+    def start(self):
+
+        self.resource.post( self.routes['start'] % {'taskid' : self['id'] } )
+
+    @classmethod
+    def stop( cls, resource=None ):
+
+        resource = resource or get_resource()
+        resource.post( cls.routes['stop'] )
+
 
