@@ -7,9 +7,10 @@ import os.path
 from pkg_resources import resource_stream
 from ConfigParser import RawConfigParser
 
-from tiktok.lib.resources import init_resource
 from tiktok import model
 from tiktok import commands
+
+from lib.resources import TikTakResource
 
 CONFIG_FILE = '~/.tiktok/config.cfg'
 
@@ -42,7 +43,10 @@ def initialize( config ):
     for (mod, obj) in modules.items():
         obj.fmt = config[mod]['format']
 
-    init_resource( config['url'], config['username'], config['password'] )
+    resource = TikTakResource( config['url'], config['username'], config['password'] )
+    resource.login()
+
+    model.basemodel.set_resource( resource )
 
 
 def dispatch( command, action, args ):
@@ -79,6 +83,7 @@ def argparser():
             description = 'Show detailed information about a task',
             #aliases = ['sh']
             )
+    show.add_argument('tasknum', type = int )
 
     start = task.add_parser(
             'start',
@@ -92,7 +97,7 @@ def argparser():
             description = 'Stop working on current task',
             #aliases = ['sto']
             )
-    stop.add_argument('-l', '--log', nargs = '+' )
+    stop.add_argument('-l', '--log', nargs = '+', default = argparse.SUPPRESS )
 
     current = task.add_parser(
             'current',
@@ -156,7 +161,6 @@ def main():
         error(msg)
 
     initialize( config )
-
 
     dispatch( command, action, args )
 
