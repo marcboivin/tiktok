@@ -1,4 +1,5 @@
-from basemodel import BaseModel
+from basemodel import BaseModel, get_resource
+from task import Task
 
 class Widget( BaseModel ):
 
@@ -6,16 +7,26 @@ class Widget( BaseModel ):
 
     routes = {
         'list'  : '/widgets/list',
-        'get'   : '/widgets/show/%(widget_id)d',
+        'tasks'   : '/widgets/show/%(widget_id)d',
     }
 
-    def tasks(self, widget_id):
-        return  [ x['task'] for x in
-                  self.resource.getjson( self.routes['get'] % {'widget_id' : widget_id} ) 
+    @classmethod
+    def tasks(cls, widget_id, resource=None):
+        resource = resource or get_resource()
+        return  [ Task( x['task'], resource ) for x in
+                    resource.getjson( cls.routes['tasks'] % {'widget_id' : widget_id} ) 
                 ]
-
-    def list(self):
-        return [ x['widget'] for x in
-                 self.resource.getjson( self.routes['list'] )
+   
+    @classmethod
+    def list( cls, resource=None ):
+        resource = resource or get_resource()
+        return [ cls( x['widget'], resource ) for x in
+                    resource.getjson( cls.routes['list'] )
                ]
+
+    @classmethod
+    def get( cls, widget_id, resource=None ):
+        resource = resource or get_resource()
+        data = resource.getjson( self.routes['get'] % {'widget_id' : widget_id } )
+        return cls( data, resource )
 
