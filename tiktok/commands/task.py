@@ -11,7 +11,14 @@ def start( args ):
     task = Task.get( args['tasknum'] )
     task.start()
 
+def updatelog( args ):
+
+    Task.updatelog( args['description'] )
+
 def stop( args ):
+
+    if 'log' in args:
+        updatelog( {'description' :  args['log']} )
 
     Task.stop()
 

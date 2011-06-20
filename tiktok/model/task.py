@@ -9,6 +9,7 @@ class Task( BaseModel ):
         'start' : '/tasks/start_work_ajax/%(taskid)d.js',
         'stop' : '/tasks/stop_work_ajax',
         'current' : '/tasks/update_sheet_info',
+        'updatelog' : '/tasks/updatelog',
     }
 
     def __init__(self, *args, **kwargs):
@@ -49,4 +50,9 @@ class Task( BaseModel ):
         resource = resource or get_resource()
         resource.post( cls.routes['stop'] )
 
+    @classmethod
+    def updatelog( cls, text, resource=None  ):
+
+        resource = resource or get_resource()
+        resource.post( cls.routes['updatelog'], {'text' : text} )
 

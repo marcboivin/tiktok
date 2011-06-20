@@ -97,13 +97,24 @@ def argparser():
             description = 'Stop working on current task',
             #aliases = ['sto']
             )
-    stop.add_argument('-l', '--log', nargs = '+', default = argparse.SUPPRESS )
+    stop.add_argument(
+            '-l', 
+            '--log', 
+            default = argparse.SUPPRESS 
+            )
 
     current = task.add_parser(
             'current',
             description = 'Information about the task you are working on right now',
             #aliases = ['cu']
             )
+
+    updatelog = task.add_parser(
+            'updatelog',
+            description = 'log a description of the work you are doing for the current task',
+            #aliases = ['ul']
+            )
+    updatelog.add_argument( 'description' )
 
     #Widget
     widget_main = commands.add_parser(
