@@ -60,14 +60,42 @@ class ClockParser( DurationParser ):
 
         return duration
 
-class ColonParser( DurationParser ):
+class StandardParser( DurationParser ):
 
-    regex = re.compile( format_regex['colons'] )
+    regex = re.compile( format_regex['standard'] )
 
     def __init__( self, days_in_week, day_length ):
         DurationParser.__init__( self )
         self.days_in_week = days_in_week
         self.day_length = day_length
+
+    def duration( self, weeks, days, hours, minutes ):
+
+        total_minutes = weeks * self.days_in_week * self.day_length
+        total_minutes += days * self.day_length
+        total_minutes += hours * 60
+        total_minutes += minutes
+
+        duration = secs_to_timedelta( total_minutes * MINUTE )
+
+        return duration
+
+    def parse( self, text ):
+
+        DurationParser.parse( self, text )
+
+        group = dict( (key, value) for (key, value) in self.match.groupdict().items() if value )
+
+        weeks = int( group.get( 'weeks', 0 ) )
+        days = int( group.get( 'days', 0 ) )
+        hours = int( group.get( 'hours', 0 ) )
+        minutes = int( group['minutes'] )
+
+        return self.duration( weeks, days, hours, minutes )
+
+class ColonParser( StandardParser ):
+
+    regex = re.compile( format_regex['colons'] )
 
     def parse( self, text ):
 
@@ -85,43 +113,7 @@ class ColonParser( DurationParser ):
         if len( numbers ) >= 7:
             weeks = int( numbers[ -6 ] )
 
-        total_minutes = weeks * self.days_in_week * self.day_length
-        total_minutes += days * self.day_length
-        total_minutes += hours * 60
-        total_minutes += minutes
-
-        duration = secs_to_timedelta( total_minutes * MINUTE )
-
-        return duration
-
-class StandardParser( DurationParser ):
-
-    regex = re.compile( format_regex['standard'] )
-
-    def __init__( self, days_in_week, day_length ):
-        DurationParser.__init__( self )
-        self.days_in_week = days_in_week
-        self.day_length = day_length
-
-    def parse( self, text ):
-
-        DurationParser.parse( self, text )
-
-        group = dict( (key, value) for (key, value) in self.match.groupdict().items() if value )
-
-        weeks = int( group.get( 'weeks', 0 ) )
-        days = int( group.get( 'days', 0 ) )
-        hours = int( group.get( 'hours', 0 ) )
-        minutes = int( group['minutes'] )
-
-        total_minutes = weeks * self.days_in_week * self.day_length
-        total_minutes += days * self.day_length
-        total_minutes += hours * 60
-        total_minutes += minutes
-
-        duration = secs_to_timedelta( total_minutes * MINUTE )
-
-        return duration
+        return self.duration( weeks, days, hours, minutes )
 
 class CompactParser( StandardParser ):
     pass
