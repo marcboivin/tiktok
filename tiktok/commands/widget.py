@@ -4,14 +4,18 @@ from tiktok.model.task import Task
 import pprint
 import sys
 
-def tasks( args ):
+def tasks( args, config, **kwargs ):
+
+    printer = kwargs['printer']
 
     tasks = Widget.tasks( args['widget_id'] )
     for task in tasks:
-        print task.format()
+        printer.pprint( task, config['task']['format'] )
 
-def list( args ):
+def list( args, config, **kwargs ):
+    
+    printer = kwargs['printer']
 
     for widget in Widget.list():
-        print widget.format()
+        printer.pprint( widget, config['widget']['format'] )
 
