@@ -5,6 +5,7 @@ format_regex = {
     'alarmclock' : r"(?P<hours>\d{1,2}):(?P<minutes>[0-5][0-9])",
     'colons' : r"((\d+):)?((\d+):)?((\d+):)?([0-5]?[0-9])",
     'standard' : r"((?P<weeks>\d+)w)? ?((?P<days>\d+)d)? ?((?P<hours>\d{1,2})h)? ?((?P<minutes>[0-5]?[0-9]?)m)?",
+    'decimal' : r"(?P<hours>\d+)\.(?P<minutes>\d{2})",
 }
 
 format_template = {
@@ -12,6 +13,7 @@ format_template = {
     'colons' : "%(weeks)d:%(days)d:%(hours)d:%(minutes)d",
     'compact' : "%(weeks)dw%(days)dd%(hours)dh%(minutes)dm",
     'standard' : "%(weeks)dw %(days)dd %(hours)dh %(minutes)dm",
+    'decimal' : "%(hours)02d.%(minutes)02d",
 }
 
 MINUTE = 60
@@ -55,6 +57,24 @@ class ClockParser( DurationParser ):
 
         hours = int( group['hours'] )
         minutes = int( group['minutes'] )
+
+        duration = secs_to_timedelta( hours * HOUR + minutes * MINUTE )
+
+        return duration
+
+class DecimalParser( DurationParser ):
+
+    regex = re.compile( format_regex['decimal'] )
+
+    def parse( self, text ):
+
+        DurationParser.parse( self, text )
+
+        group = self.match.groupdict()
+
+        hours = int( group['hours'] )
+        minutes = int( group['minutes'] )
+        minutes = int( minutes / 100.0 * 60 )
 
         duration = secs_to_timedelta( hours * HOUR + minutes * MINUTE )
 
@@ -141,6 +161,23 @@ class ClockFormat( DurationFormat ):
                 'minutes' : minutes
                 }
 
+class DecimalFormat( DurationFormat ):
+
+    template = format_template['decimal']
+
+    def format( self, duration ):
+
+        secs = total_seconds( duration )
+
+        hours = secs / HOUR
+        minutes = (secs % HOUR) / MINUTE
+        minutes = int( minutes / 60.0 * 100 )
+
+        return self.template % {
+                'hours' : hours,
+                'minutes' : minutes
+                }
+
 class StandardFormat( DurationFormat ):
 
     template = format_template['standard']
@@ -187,6 +224,12 @@ if __name__ == '__main__':
 
     t = parser.parse( "12:34" )
     secs = 12 * HOUR + 34 * MINUTE
+    assert total_seconds( t ) == secs
+
+    parser = DecimalParser()
+
+    t = parser.parse( "12.99" )
+    secs = 12 * HOUR + 59 * MINUTE
     assert total_seconds( t ) == secs
 
     parser = ColonParser( 5, 7 * 60 )
