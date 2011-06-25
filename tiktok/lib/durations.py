@@ -87,7 +87,7 @@ class ColonParser( DurationParser ):
 
         total_minutes = weeks * self.days_in_week * self.day_length
         total_minutes += days * self.day_length
-        total_minutes += hours * HOUR
+        total_minutes += hours * 60
         total_minutes += minutes
 
         duration = secs_to_timedelta( total_minutes * MINUTE )
@@ -116,12 +116,17 @@ class StandardParser( DurationParser ):
 
         total_minutes = weeks * self.days_in_week * self.day_length
         total_minutes += days * self.day_length
-        total_minutes += hours * MINUTE
+        total_minutes += hours * 60
         total_minutes += minutes
 
         duration = secs_to_timedelta( total_minutes * MINUTE )
 
         return duration
+
+class CompactParser( StandardParser ):
+    pass
+
+
 
 class DurationFormat( object ):
 
