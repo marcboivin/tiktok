@@ -11,22 +11,22 @@ class Widget( BaseModel ):
     }
 
     @resourcemethod
-    def tasks(cls, resource, widget_id ):
-        resource = resource or get_resource()
-        return  [ Task( x['task'], resource ) for x in
+    def tasks(cls, widget_id, **kwargs ):
+        resource = kwargs['resource']
+        return  [ Task( x['task'], **kwargs ) for x in
                     resource.getjson( cls.routes['tasks'] % {'widget_id' : widget_id} ) 
                 ]
 
     @resourcemethod
-    def list( cls, resource ):
-        resource = resource or get_resource()
-        return [ cls( x['widget'], resource ) for x in
+    def list( cls, widget_id, **kwargs ):
+        resource = kwargs['resource']
+        return [ cls( x['widget'], **kwargs ) for x in
                     resource.getjson( cls.routes['list'] )
                ]
 
     @resourcemethod
-    def get( cls, resource, widget_id ):
-        resource = resource or get_resource()
+    def get( cls, widget_id, **kwargs ):
+        resource = kwargs['resource']
         data = resource.getjson( self.routes['get'] % {'widget_id' : widget_id } )
-        return cls( data, resource )
+        return cls( data, **kwargs )
 
