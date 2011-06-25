@@ -1,4 +1,4 @@
-from basemodel import BaseModel, get_resource
+from basemodel import BaseModel, resourcemethod
 
 class Task( BaseModel ):
 
@@ -22,16 +22,14 @@ class Task( BaseModel ):
         self.update(data)
 
 
-    @classmethod
-    def get( cls, tasknum, resource=None ):
+    @resourcemethod
+    def get( cls, resource, tasknum ):
 
-        resource = resource or get_resource()
         return cls( resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task'] )
 
-    @classmethod
-    def current( cls, resource=None ):
+    @resourcemethod
+    def current( cls, resource ):
 
-        resource = resource or get_resource()
         task = None
         data = resource.postjson( cls.routes['current'] )
 
@@ -44,15 +42,13 @@ class Task( BaseModel ):
 
         self.resource.post( self.routes['start'] % {'taskid' : self['id'] } )
 
-    @classmethod
-    def stop( cls, resource=None ):
+    @resourcemethod
+    def stop( cls, resource ):
 
-        resource = resource or get_resource()
         resource.post( cls.routes['stop'] )
 
-    @classmethod
-    def updatelog( cls, text, resource=None  ):
+    @resourcemethod
+    def updatelog( cls, resource, text ):
 
-        resource = resource or get_resource()
         resource.post( cls.routes['updatelog'], {'text' : text} )
 
