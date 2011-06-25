@@ -19,14 +19,15 @@ HOUR = MINUTE * 60
 DAY = HOUR * 24
 WEEK = DAY * 7
 
-def secs_to_timedict( secs ):
-    return {
+def secs_to_timedelta( secs ):
+    info = {
         'weeks' : secs / WEEK,
         'days' : (secs % WEEK) / DAY,
         'hours' : (secs % DAY) / HOUR,
         'minutes' : (secs % HOUR) / MINUTE,
         'seconds' : (secs % MINUTE)
     }
+    return datetime.timedelta( **info )
 
 def total_seconds( td ):
 
@@ -55,9 +56,9 @@ class ClockParser( DurationParser ):
         hours = int( group['hours'] )
         minutes = int( group['minutes'] )
 
-        duration = secs_to_timedict( hours * HOUR + minutes * MINUTE )
+        duration = secs_to_timedelta( hours * HOUR + minutes * MINUTE )
 
-        return datetime.timedelta( **duration )
+        return duration
 
 class ColonParser( DurationParser ):
 
@@ -89,9 +90,9 @@ class ColonParser( DurationParser ):
         total_minutes += hours * HOUR
         total_minutes += minutes
 
-        duration = secs_to_timedict( total_minutes * MINUTE )
+        duration = secs_to_timedelta( total_minutes * MINUTE )
 
-        return datetime.timedelta( **duration )
+        return duration
 
 class StandardParser( DurationParser ):
 
@@ -118,15 +119,14 @@ class StandardParser( DurationParser ):
         total_minutes += hours * MINUTE
         total_minutes += minutes
 
-        duration = secs_to_timedict( total_minutes * MINUTE )
+        duration = secs_to_timedelta( total_minutes * MINUTE )
 
-        return datetime.timedelta( **duration )
+        return duration
 
 class DurationFormat( object ):
 
     def format( self, duration ):
         raise NotImplementedError
-
 
 class ClockFormat( DurationFormat ):
 
