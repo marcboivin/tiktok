@@ -10,9 +10,9 @@ format_regex = {
 
 format_template = {
     'alarmclock' : "%(hours)02d:%(minutes)02d",
-    'colons' : "%(weeks)d:%(days)d:%(hours)d:%(minutes)d",
-    'compact' : "%(weeks)dw%(days)dd%(hours)dh%(minutes)dm",
-    'standard' : "%(weeks)dw %(days)dd %(hours)dh %(minutes)dm",
+    'colons' : "%(weeks)s%(days)s%(hours)s%(minutes)s",
+    'compact' : "%(weeks)s%(days)s%(hours)s%(minutes)s",
+    'standard' : "%(weeks)s %(days)s %(hours)s %(minutes)s",
     'decimal' : "%(hours)02d.%(minutes)02d",
 }
 
@@ -182,12 +182,25 @@ class StandardFormat( DurationFormat ):
 
     template = format_template['standard']
 
+    whitespace = re.compile( r"\s{2,}" )
+
+    suffixes = {
+        'weeks' : 'w',
+        'days' : 'd',
+        'hours' : 'h',
+        'minutes' : 'm'
+    }
+
+    particle_template = "%d%s"
+
+    elements = ( 'weeks', 'days', 'hours', 'minutes' )
+
     def __init__( self, days_in_week, day_length ):
         DurationFormat.__init__( self )
         self.days_in_week = days_in_week
         self.day_length = day_length
 
-    def format( self, duration ):
+    def values( self, duration ):
 
         total_minutes = total_seconds( duration ) / MINUTE
 
@@ -200,14 +213,36 @@ class StandardFormat( DurationFormat ):
         hours = total_minutes / 60
         minutes = total_minutes % 60
 
-        data = {
-            'weeks' : weeks,
-            'days' : days,
-            'hours' : hours,
-            'minutes' : minutes,
-            }
+        return (weeks, days, hours, minutes)
 
-        return self.template % data
+    def particle( self, suffix, value ):
+        return self.particle_template % (value, self.suffixes[suffix])
+
+    def sub_template( self, particles ):
+
+        data = {
+            'weeks' : '',
+            'days' : '',
+            'hours' : '',
+            'minutes' : '',
+        }
+        data.update( particles )
+
+        fmt = self.template % data
+
+        return self.whitespace.sub( " ", fmt ).strip()
+
+    def format( self, duration ):
+
+        values = zip( self.elements, self.values( duration ) )
+
+        data = {}
+
+        for suffix, value in values:
+            if value > 0:
+                data[suffix] = self.particle( suffix, value )
+
+        return self.sub_template( data )
 
 class ColonFormat( StandardFormat ):
 
