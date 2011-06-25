@@ -280,11 +280,14 @@ class CompactFormat( StandardFormat ):
 
 if __name__ == '__main__':
 
+    #Parser tests
     parser = ClockParser()
 
     t = parser.parse( "12:34" )
     secs = 12 * HOUR + 34 * MINUTE
     assert total_seconds( t ) == secs
+
+    
 
     parser = DecimalParser()
 
@@ -309,6 +312,8 @@ if __name__ == '__main__':
     t = parser.parse( "4" )
     secs = 4 * MINUTE
     assert total_seconds( t ) == secs
+
+
 
     parser = StandardParser( 5, 7 * 60 )
 
@@ -335,3 +340,81 @@ if __name__ == '__main__':
     t = parser.parse( "0001d 2m" )
     secs = 7 * HOUR + 2 * MINUTE
     assert total_seconds( t ) == secs
+
+
+
+    #Format tests
+    f = ClockFormat()
+
+    t = secs_to_timedelta( HOUR * 34 + MINUTE * 56 )
+    assert f.format( t ) == "34:56"
+
+
+
+    f = DecimalFormat()
+
+    t = secs_to_timedelta( HOUR * 12 + MINUTE * 59 )
+    assert f.format( t ) == "12.98"
+
+    t = secs_to_timedelta( HOUR * 12 + MINUTE * 30 )
+    assert f.format( t ) == "12.50"
+
+
+
+    day = 7 * HOUR
+    week = 5 * day
+    hour = HOUR
+    minute = MINUTE
+
+    f = StandardFormat( 5, 7 * 60 )
+
+    t = secs_to_timedelta( 1 * week + 2 * day + 3 * hour + 4 * minute )
+    assert f.format( t ) == "1w 2d 3h 4m"
+
+    t = secs_to_timedelta( 1 * day + 2 * hour + 3 * minute )
+    assert f.format( t ) == "1d 2h 3m"
+
+    t = secs_to_timedelta( 1 * hour + 2 * minute )
+    assert f.format( t ) == "1h 2m"
+
+    t = secs_to_timedelta( minute )
+    assert f.format( t ) == "1m"
+
+    t = secs_to_timedelta( 1 * week + 2 * hour )
+    assert f.format( t ) == "1w 2h"
+
+
+
+    f = CompactFormat( 5, 7 * 60 )
+
+    t = secs_to_timedelta( 1 * week + 2 * day + 3 * hour + 4 * minute )
+    assert f.format( t ) == "1w2d3h4m"
+
+    t = secs_to_timedelta( 1 * day + 2 * hour + 3 * minute )
+    assert f.format( t ) == "1d2h3m"
+
+    t = secs_to_timedelta( 1 * hour + 2 * minute )
+    assert f.format( t ) == "1h2m"
+
+    t = secs_to_timedelta( minute )
+    assert f.format( t ) == "1m"
+
+    t = secs_to_timedelta( 1 * week + 2 * hour )
+    assert f.format( t ) == "1w2h"
+
+
+
+    f = ColonFormat( 5, 7 * 60 )
+
+    t = secs_to_timedelta( 1 * week + 2 * day + 3 * hour + 4 * minute )
+    assert f.format( t ) == "1:2:3:4"
+
+    t = secs_to_timedelta( 1 * day + 2 * hour + 3 * minute )
+    assert f.format( t ) == "1:2:3"
+
+    t = secs_to_timedelta( 1 * day + 2 * minute )
+    assert f.format( t ) == "1:0:2"
+
+    t = secs_to_timedelta( 1 * week + 2 * minute )
+    assert f.format( t ) == "1:0:0:2"
+
