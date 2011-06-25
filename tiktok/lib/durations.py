@@ -188,3 +188,55 @@ class CompactFormat( StandardFormat ):
 
     template = format_template['compact']
 
+
+if __name__ == '__main__':
+
+    parser = ClockParser()
+
+    t = parser.parse( "12:34" )
+    secs = 12 * HOUR + 34 * MINUTE
+    assert total_seconds( t ) == secs
+
+    parser = ColonParser( 5, 7 * 60 )
+
+    t = parser.parse( "1:2:3:4" )
+    secs = 5 * ( 7 * HOUR ) + 2 * ( 7 * HOUR ) + 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "2:03:4" )
+    secs = 2 * ( 7 * HOUR ) + 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "3:04" )
+    secs = 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "4" )
+    secs = 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    parser = StandardParser( 5, 7 * 60 )
+
+    t = parser.parse( "1w 2d 3h 4m" )
+    secs = 5 * ( 7 * HOUR ) + 2 * ( 7 * HOUR ) + 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "002d 3h 4m" )
+    secs = 2 * ( 7 * HOUR ) + 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "03h 4m" )
+    secs = 3 * HOUR + 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "04m" )
+    secs = 4 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "1w 2h 3m" )
+    secs = 5 * ( 7 * HOUR ) + 2 * HOUR + 3 * MINUTE
+    assert total_seconds( t ) == secs
+
+    t = parser.parse( "0001d 2m" )
+    secs = 7 * HOUR + 2 * MINUTE
+    assert total_seconds( t ) == secs
