@@ -9,6 +9,16 @@ def set_resource( new_resource ):
     global resource
     resource = new_resource
 
+def resourcemethod( func ):
+
+    @classmethod
+    def wrapper( cls, *args, **kwargs ):
+        resource = kwargs.get('resource', get_resource())
+
+        return func( cls, resource, *args, **kwargs )
+
+    return wrapper
+
 class BaseModel( dict ):
 
     def __init__(self, attributes, resource=None):
