@@ -7,10 +7,13 @@ import os.path
 from pkg_resources import resource_stream
 from ConfigParser import RawConfigParser
 
+import tiktok.config
 from tiktok import model
 from tiktok import commands
 
 from lib.resources import TikTakResource
+from lib import durations
+from lib.prettyprinter import PrettyPrinter
 
 CONFIG_FILE = '~/.tiktok/config.cfg'
 
@@ -35,25 +38,52 @@ def load_config( path ):
 
 def initialize( config ):
 
-    modules = {
-        'widget' : model.widget.Widget,
-        'task' : model.task.Task,
-    }
-
-    for (mod, obj) in modules.items():
-        obj.fmt = config[mod]['format']
-
     resource = TikTakResource( config['url'], config['username'], config['password'] )
     resource.login()
 
-    model.basemodel.set_resource( resource )
+    d_format = config['duration_format']
 
+    d_items = {
+        'alarmclock' : (durations.ClockParser, durations.ClockFormat),
+        'decimal' : (durations.DecimalParser, durations.DecimalFormat),
+        'standard' : (durations.StandardParser, durations.StandardFormat),
+        'compact' : (durations.CompactParser, durations.CompactFormat),
+        'colons' : (durations.ColonParser, durations.ColonFormat)
+    }
 
-def dispatch( command, action, args ):
+    d_config = {}
+
+    if d_format in ('alarmclock', 'decimal'):
+        d_config = {
+            'parser' : d_items[d_format][0](),
+            'formatter' : d_items[d_format][1]()
+        }
+    else:
+        d_config = {
+            'parser' : d_items[d_format][0](
+                int( config['days_in_week'] ),
+                int( config['minutes_in_day'] )
+            ),
+            'formatter' : d_items[d_format][0](
+                int( config['days_in_week'] ),
+                int( config['minutes_in_day'] )
+            ),
+        }
+
+    utils = {
+        'resource' : resource,
+        'duration_parser' : d_config['parser'],
+        'printer' : PrettyPrinter( d_config['formatter'], config['datetime_format'] )
+    }
+
+    model.basemodel.set_utils( utils )
+    tiktok.config.set_utils( utils )
+
+def dispatch( command, action, args, config ):
 
     module = vars( commands )[ command ]
     func = getattr( module, action )
-    func( args )
+    func( args, config, **tiktok.config.get_utils() )
 
 def argparser():
 
@@ -173,7 +203,7 @@ def main():
 
     initialize( config )
 
-    dispatch( command, action, args )
+    dispatch( command, action, args, config )
 
 if __name__ == '__main__':
     main()
