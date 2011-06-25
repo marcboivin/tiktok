@@ -246,7 +246,32 @@ class StandardFormat( DurationFormat ):
 
 class ColonFormat( StandardFormat ):
 
+    suffixes = {
+        'weeks' : ':',
+        'days' : ':',
+        'hours' : ':',
+        'minutes' : '',
+    }
+
     template = format_template['colons']
+
+    def format( self, duration ):
+
+        values = zip( self.elements, self.values( duration ) )
+        data = {}
+
+        for x in range( len( values ) ):
+
+            suffix, value = values[x]
+
+            if value > 0:
+                data[suffix] = self.particle( suffix, value )
+                for sub_s, sub_v in values[x + 1:]:
+                    data[sub_s] = self.particle( sub_s, 0 )
+
+
+        return self.sub_template( data )
+
 
 class CompactFormat( StandardFormat ):
 
