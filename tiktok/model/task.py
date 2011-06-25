@@ -1,8 +1,7 @@
 from basemodel import BaseModel, resourcemethod
+from tiktok.lib.durations import secs_to_timedelta
 
 class Task( BaseModel ):
-
-    fmt = u"#%(task_num)d %(name)s - %(w_hour)02d:%(w_min)02d / %(d_hour)02d:%(d_min)02d"
 
     routes = {
         'get' : '/tasks/edit/%(tasknum)d.json',
@@ -15,26 +14,29 @@ class Task( BaseModel ):
     def __init__(self, *args, **kwargs):
 
         BaseModel.__init__(self, *args, **kwargs)
-        data = {'w_hour' : self['worked_minutes'] / 60,
-                'w_min' : self['worked_minutes'] % 60,
-                'd_hour' : self['duration'] / 60,
-                'd_min' : self['duration'] % 60 }
+        data = {
+            'duration' : secs_to_timedelta( self['duration'] * 60 ),
+            'worked' : secs_to_timedelta( self['worked_minutes'] * 60 ),
+        }
         self.update(data)
+        self.pop( 'worked_minutes' )
 
 
     @resourcemethod
-    def get( cls, resource, tasknum ):
+    def get( cls, tasknum, **kwargs ):
+        resource = kwargs['resource']
 
-        return cls( resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task'] )
+        return cls( resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task'], **kwargs )
 
     @resourcemethod
-    def current( cls, resource ):
+    def current( cls, **kwargs ):
+        resource = kwargs['resource']
 
         task = None
         data = resource.postjson( cls.routes['current'] )
 
         if data:
-            task = cls( data['sheet'], resource )
+            task = cls( data['sheet'], **kwargs )
 
         return task
 
@@ -43,12 +45,14 @@ class Task( BaseModel ):
         self.resource.post( self.routes['start'] % {'taskid' : self['id'] } )
 
     @resourcemethod
-    def stop( cls, resource ):
+    def stop( cls, **kwargs ):
+        resource = kwargs['resource']
 
         resource.post( cls.routes['stop'] )
 
     @resourcemethod
-    def updatelog( cls, resource, text ):
+    def updatelog( cls, text, **kwargs ):
+        resource = kwargs['resource']
 
         resource.post( cls.routes['updatelog'], {'text' : text} )
 
