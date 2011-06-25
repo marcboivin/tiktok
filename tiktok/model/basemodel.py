@@ -1,34 +1,28 @@
 
-resource = None
+utils = {}
 
-def get_resource():
-    global resource
-    return resource
+def get_utils():
+    global utils
+    return utils
 
-def set_resource( new_resource ):
-    global resource
-    resource = new_resource
+def set_utils( new_utils ):
+    global utils
+    utils = new_utils
 
 def resourcemethod( func ):
 
     @classmethod
     def wrapper( cls, *args, **kwargs ):
-        resource = kwargs.get('resource', get_resource())
-
-        return func( cls, resource, *args, **kwargs )
+        new_kw = get_utils()
+        new_kw.update( kwargs )
+        return func( cls, *args, **new_kw )
 
     return wrapper
 
 class BaseModel( dict ):
 
-    def __init__(self, attributes, resource=None):
+    def __init__(self, attributes, **kwargs ):
 
-        resource = resource or get_resource()
-        if not resource:
-            raise RuntimeError("resource is null and no default resource has been initialized")
-
-        self.resource = resource
+        self.resource = kwargs['resource']
+        self.duration_parser = kwargs['duration_parser']
         self.update( attributes )
-
-    def format( self ):
-        return self.fmt % self
