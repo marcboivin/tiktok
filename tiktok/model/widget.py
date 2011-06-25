@@ -6,8 +6,8 @@ class Widget( BaseModel ):
     fmt = "#%(id)d %(name)s - type:%(widget_type)s"
 
     routes = {
-        'list'  : '/widgets/list',
-        'tasks'   : '/widgets/show/%(widget_id)d',
+        'list'  : '/widgets/list.json',
+        'tasks'   : '/widgets/show/%(widget_id)d.json',
     }
 
     @classmethod

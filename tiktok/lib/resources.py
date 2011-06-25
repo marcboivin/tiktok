@@ -47,8 +47,6 @@ class TikTakResource( restkit.Resource ):
 
 
     def json_request(self, method, path, payload=None, headers=None, params_dict=None, **params):
-        if not path.endswith('.json'):
-            path += '.json'
         resp = self.request(method, path, payload, headers, params_dict, **params)
         return json.loads( resp.body_string() )
 

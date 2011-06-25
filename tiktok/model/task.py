@@ -5,11 +5,11 @@ class Task( BaseModel ):
     fmt = u"#%(task_num)d %(name)s - %(w_hour)02d:%(w_min)02d / %(d_hour)02d:%(d_min)02d"
 
     routes = {
-        'get' : '/tasks/%(tasknum)d/edit',
+        'get' : '/tasks/edit/%(tasknum)d.json',
         'start' : '/tasks/start_work_ajax/%(taskid)d.js',
         'stop' : '/tasks/stop_work_ajax',
-        'current' : '/tasks/update_sheet_info',
-        'updatelog' : '/tasks/updatelog',
+        'current' : '/tasks/update_sheet_info.json',
+        'updatelog' : '/tasks/updatelog.json',
     }
 
     def __init__(self, *args, **kwargs):
