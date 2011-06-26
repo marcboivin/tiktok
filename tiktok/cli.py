@@ -15,7 +15,11 @@ from lib.resources import TikTakResource
 from lib import durations
 from lib.prettyprinter import PrettyPrinter
 
-CONFIG_FILE = '~/.tiktok/config.cfg'
+from cookielib import LWPCookieJar
+
+CONFIG_DIR = '~/.tiktok'
+CONFIG_FILE = CONFIG_DIR + '/config.cfg'
+COOKIE_FILE = CONFIG_DIR + '/cookies.lwp'
 
 def load_config( path ):
 
@@ -38,8 +42,20 @@ def load_config( path ):
 
 def initialize( config ):
 
-    resource = TikTakResource( config['url'], config['username'], config['password'] )
-    resource.login()
+
+    config_dir = os.path.expanduser( CONFIG_DIR )
+    cookiefile = os.path.expanduser( COOKIE_FILE )
+
+    cookiejar = LWPCookieJar( cookiefile )
+
+    if not os.path.exists( config_dir ):
+        os.mkdir( config_dir )
+    if os.path.exists( cookiefile ):
+        print "loading cookies"
+        cookiejar.load()
+
+    resource = TikTakResource( config['url'], config['username'], config['password'], cookiejar = cookiejar )
+    #resource.login()
 
     d_format = config['duration_format']
 
@@ -80,6 +96,12 @@ def initialize( config ):
 
     model.basemodel.set_utils( utils )
     tiktok.config.set_utils( utils )
+
+    return cookiejar
+
+def cleanup( cookiejar ):
+
+    cookiejar.save( ignore_discard = True )
 
 def dispatch( command, action, args, config ):
 
@@ -215,9 +237,11 @@ def main():
         msg += "Please add them to the config file or pass them as arguments to the command line\n"
         error(msg)
 
-    initialize( config )
+    cookiejar = initialize( config )
 
     dispatch( command, action, args, config )
+
+    cleanup( cookiejar )
 
 if __name__ == '__main__':
     main()

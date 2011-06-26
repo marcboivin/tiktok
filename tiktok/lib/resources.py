@@ -29,6 +29,7 @@ class TikTakResource( restkit.Resource ):
 
         self.username = username
         self.password = password
+        self.login_done = False
 
     def login(self):
 
@@ -38,13 +39,30 @@ class TikTakResource( restkit.Resource ):
         }
 
         resp = restkit.Resource.request( self, 'POST', routes['login'], data )
+        print resp.status_int
+        print resp.location
         if not ( 300 < resp.status_int < 400 and resp.location.endswith( routes['dashboard'] ) ):
             raise LoginError( self.username )
 
     def logout(self):
 
         self.get( routes['logout'], data )
+        self.login_done = True
 
+    def request( self, *args, **kwargs ):
+        resp = restkit.Resource.request( self, *args, **kwargs )
+        print "RESP IS ", resp
+        print resp.status_int
+        print resp.location
+        if 300 < resp.status_int < 400 and resp.location.endswith('/login/login') and not self.login_done:
+            print "LOGGING IN"
+            self.login()
+            print args, kwargs
+            resp = restkit.Resource.request( self, *args, **kwargs )
+            print resp.status_int
+            print resp.location
+            print resp.body_string()
+        return resp
 
     def json_request(self, method, path, payload=None, headers=None, params_dict=None, **params):
         resp = self.request(method, path, payload, headers, params_dict, **params)
