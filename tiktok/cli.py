@@ -73,7 +73,9 @@ def initialize( config ):
     utils = {
         'resource' : resource,
         'duration_parser' : d_config['parser'],
-        'printer' : PrettyPrinter( d_config['formatter'], config['datetime_format'] )
+        'duration_formatter' : d_config['formatter'],
+        'datetime_format' : config['datetime_format'],
+        'printer' : PrettyPrinter( d_config['formatter'], config['datetime_format'] ),
     }
 
     model.basemodel.set_utils( utils )
@@ -87,9 +89,10 @@ def dispatch( command, action, args, config ):
 
 def argparser():
 
-    parser = argparse.ArgumentParser( 
+    parser = argparse.ArgumentParser(
             description = 'CLI app for interacting with TikTak.',
-            prog='tiktok' 
+            prog='tiktok',
+            formatter_class = argparse.ArgumentDefaultsHelpFormatter
             )
 
     parser.add_argument('-c', '--config', default = CONFIG_FILE , dest='configfile')
@@ -128,9 +131,9 @@ def argparser():
             #aliases = ['sto']
             )
     stop.add_argument(
-            '-l', 
-            '--log', 
-            default = argparse.SUPPRESS 
+            '-l',
+            '--log',
+            default = argparse.SUPPRESS
             )
 
     current = task.add_parser(
@@ -145,6 +148,17 @@ def argparser():
             #aliases = ['ul']
             )
     updatelog.add_argument( 'description' )
+
+    addlog = task.add_parser(
+            'addlog',
+            description = 'add a log of a work period',
+            #aliases = ['al']
+            )
+    addlog.add_argument( 'tasknum')
+    addlog.add_argument( 'start' )
+    addlog.add_argument( '--end', '-e', dest ='end', default = argparse.SUPPRESS )
+    addlog.add_argument( '--duration', '-d', dest = 'duration', default = argparse.SUPPRESS )
+    addlog.add_argument( '--log', '-l', dest = 'log', default = argparse.SUPPRESS )
 
     #Widget
     widget_main = commands.add_parser(
