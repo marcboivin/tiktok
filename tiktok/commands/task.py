@@ -26,7 +26,10 @@ def stop( args, config, **kwargs ):
 def current( args, config, **kwargs ):
 
     task = Task.current()
-    pprint.pprint( task )
+
+    if task:
+        kwargs['printer'].pprint( task, config['task']['format'] )
+        print "Description: %s" % task['body']
 
 def addlog( args, config, **kwargs ):
 
