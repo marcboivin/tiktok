@@ -5,7 +5,7 @@ class Task( BaseModel ):
 
     routes = {
         'get' : '/tasks/edit/%(tasknum)d.json',
-        'start' : '/tasks/start_work_ajax/%(taskid)d.js',
+        'start' : '/tasks/start_work_ajax/%(task_id)d.js',
         'stop' : '/tasks/stop_work_ajax',
         'current' : '/tasks/update_sheet_info.json',
         'updatelog' : '/tasks/updatelog.json',
@@ -42,7 +42,7 @@ class Task( BaseModel ):
 
     def start(self):
 
-        self.resource.post( self.routes['start'] % {'taskid' : self['id'] } )
+        self.resource.post( self.routes['start'] % {'task_id' : self['id'] } )
 
     @resourcemethod
     def stop( cls, **kwargs ):
