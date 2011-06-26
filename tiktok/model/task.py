@@ -40,7 +40,11 @@ class Task( BaseModel ):
         data = resource.postjson( cls.routes['current'] )
 
         if data:
-            task = cls( data['sheet'], **kwargs )
+            data = data['sheet']
+            data['sheet_id'] = data.pop('id')
+            data['id'] = data.pop('task_id')
+            data['name'] = data.pop('task_name')
+            task = cls( data, **kwargs )
 
         return task
 
