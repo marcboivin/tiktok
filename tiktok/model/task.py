@@ -7,7 +7,7 @@ class Task( BaseModel ):
 
     routes = {
         'get' : '/tasks/edit/%(tasknum)d.json',
-        'start' : '/tasks/start_work_ajax/%(task_id)d.js',
+        'start' : '/tasks/start_work_ajax/%(task_id)d',
         'stop' : '/tasks/stop_work_ajax',
         'current' : '/tasks/update_sheet_info.json',
         'updatelog' : '/tasks/updatelog.json',
