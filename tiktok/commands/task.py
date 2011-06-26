@@ -30,12 +30,15 @@ def current( args, config, **kwargs ):
 
 def addlog( args, config, **kwargs ):
 
-    args['start'] = datetime.datetime.strptime( args['start'], config['datetime_format'] )
+    for key in ( x for x in ('start', 'end') if x in args ):
+        try:
+            args[key] = datetime.datetime.strptime( args[key], config['datetime_format'] )
+        except ValueError:
+            time = datetime.datetime.strptime( args[key], config['time_format'] ).time()
+            args[key] = datetime.datetime.combine( datetime.date.today(), time )
 
     if 'duration' in args:
         args['duration'] = kwargs['duration_parser'].parse( args['duration'] )
-    if 'end' in args:
-        args['end'] = datetime.datetime.strptime( args['end'], config['datetime_format'] )
 
     task = Task.get( int( args['tasknum'] ) )
     task.addlog( **args )
