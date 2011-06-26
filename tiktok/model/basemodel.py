@@ -23,6 +23,6 @@ class BaseModel( dict ):
 
     def __init__(self, attributes, **kwargs ):
 
-        self.resource = kwargs['resource']
-        self.duration_parser = kwargs['duration_parser']
+        for key, value in kwargs.items():
+            setattr( self, key, value )
         self.update( attributes )
