@@ -1,0 +1,41 @@
+TikTok
+======
+
+A CLI frontend to TikTak (http://github.com/sys-tech/tiktak)
+
+Hacked together by Gregory Eric Sanderson Turcot Temlett MacDonnell Forbes
+
+All code in this project is licensed under the GPL v3
+
+Installation
+------------
+
+    git clone http://github.com/gelendir/tiktok.git
+    cd tiktok
+    sudo python setup.py install
+
+Configuration
+-------------
+
+Copy the file tiktok/config/defaults.cfg to ~/.tiktok/config.cfg and edit at
+your leisure. 
+
+Usage
+-----
+
+tiktok actions are divided into modules. Each module has a series of commands.
+Each command may have an optional list of parameters
+For example : To execute the list command in the widget module, you would do
+
+    tiktok widget list
+
+To start task number 1234, you would do
+
+    tiktok task start 1234
+
+tiktok --help will show a list of available modules. Conversely, to show all
+commands available in a module, or to see a command's parameters, type
+
+    tiktok module --help
+    tiktok module command --help
+
