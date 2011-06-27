@@ -16,6 +16,9 @@ Program for accessing TikTak through the command-line""",
       license='GPL3',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
+      package_data = {
+        'tiktok' : ['config/defaults.cfg'],
+      },
       zip_safe=True,
       install_requires=[
           'restkit>=3.2.1'
