@@ -10,7 +10,7 @@ All code in this project is licensed under the GPL v3
 Installation
 ------------
 
-    git clone http://github.com/gelendir/tiktok.git
+    git clone git://github.com/gelendir/tiktok.git
     cd tiktok
     sudo python setup.py install
 
