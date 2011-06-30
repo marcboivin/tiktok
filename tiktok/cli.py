@@ -64,7 +64,7 @@ def initialize( config ):
                 int( config['days_in_week'] ),
                 int( config['minutes_in_day'] )
             ),
-            'formatter' : d_items[d_format][0](
+            'formatter' : d_items[d_format][1](
                 int( config['days_in_week'] ),
                 int( config['minutes_in_day'] )
             ),
