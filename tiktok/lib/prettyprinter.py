@@ -15,7 +15,7 @@ class PrettyPrinter( object ):
             if isinstance( value, datetime.timedelta ):
                 data[key] = self.duration_formatter.format( value )
             elif isinstance( value, datetime.datetime ):
-                data[key] = datetime.datetime.strftime( value )
+                data[key] = datetime.datetime.strftime( value, self.datetime_format )
             else:
                 data[key] = value
 
