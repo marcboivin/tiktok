@@ -46,3 +46,7 @@ def addlog( args, config, **kwargs ):
     task = Task.get( int( args['tasknum'] ) )
     task.addlog( **args )
 
+def cancel( args, config, **kwargs ):
+
+    Task.cancel()
+
