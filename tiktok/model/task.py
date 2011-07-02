@@ -13,6 +13,7 @@ class Task( BaseModel ):
         'updatelog' : '/tasks/updatelog.json',
         'addlog' : '/tasks/add_log/%(task_id)d.json',
         'savelog' : '/tasks/save_log/%(worklog_id)d.json',
+        'cancellog' : '/tasks/cancel_work_ajax'
     }
 
     def __init__(self, *args, **kwargs):
@@ -63,6 +64,12 @@ class Task( BaseModel ):
         resource = kwargs['resource']
 
         resource.post( cls.routes['updatelog'], {'text' : text} )
+
+    @resourcemethod
+    def cancel( cls, **kwargs ):
+        resource = kwargs['resource']
+
+        resource.post( cls.routes['cancellog'] )
 
     def addlog( self, **kwargs ):
         """
