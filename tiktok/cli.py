@@ -149,8 +149,20 @@ def argparser():
             )
     updatelog.add_argument( 'description' )
 
-    addlog = task.add_parser(
-            'addlog',
+    cancel = task.add_parser(
+            'cancel',
+            description = 'cancel the task you are working on right now'
+            #aliases = ['cl']
+            )
+
+    log = commands.add_parser(
+            'log',
+            #aliases = ['l', 'lo'],
+            description = 'Log related commands'
+            ).add_subparsers( dest='action' )
+
+    addlog = log.add_parser(
+            'add',
             description = 'add a log of a work period',
             #aliases = ['al']
             )
@@ -159,12 +171,6 @@ def argparser():
     addlog.add_argument( '--end', '-e', dest ='end', default = argparse.SUPPRESS )
     addlog.add_argument( '--duration', '-d', dest = 'duration', default = argparse.SUPPRESS )
     addlog.add_argument( '--log', '-l', dest = 'log', default = argparse.SUPPRESS )
-
-    cancel = task.add_parser(
-            'cancel',
-            description = 'cancel the task you are working on right now'
-            #aliases = ['cl']
-            )
 
     #Widget
     widget_main = commands.add_parser(
