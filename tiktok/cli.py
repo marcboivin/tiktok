@@ -160,6 +160,12 @@ def argparser():
     addlog.add_argument( '--duration', '-d', dest = 'duration', default = argparse.SUPPRESS )
     addlog.add_argument( '--log', '-l', dest = 'log', default = argparse.SUPPRESS )
 
+    cancel = task.add_parser(
+            'cancel',
+            description = 'cancel the task you are working on right now'
+            #aliases = ['cl']
+            )
+
     #Widget
     widget_main = commands.add_parser(
             'widget',
