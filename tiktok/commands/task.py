@@ -31,21 +31,6 @@ def current( args, config, **kwargs ):
         kwargs['printer'].pprint( task, config['task']['format'] )
         print "Description: %s" % task['body']
 
-def addlog( args, config, **kwargs ):
-
-    for key in ( x for x in ('start', 'end') if x in args ):
-        try:
-            args[key] = datetime.datetime.strptime( args[key], config['datetime_format'] )
-        except ValueError:
-            time = datetime.datetime.strptime( args[key], config['time_format'] ).time()
-            args[key] = datetime.datetime.combine( datetime.date.today(), time )
-
-    if 'duration' in args:
-        args['duration'] = kwargs['duration_parser'].parse( args['duration'] )
-
-    task = Task.get( int( args['tasknum'] ) )
-    task.addlog( **args )
-
 def cancel( args, config, **kwargs ):
 
     Task.cancel()
