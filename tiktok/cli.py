@@ -175,8 +175,20 @@ def argparser():
             )
     updatelog.add_argument( 'description' )
 
-    addlog = task.add_parser(
-            'addlog',
+    cancel = task.add_parser(
+            'cancel',
+            description = 'cancel the task you are working on right now'
+            #aliases = ['cl']
+            )
+
+    log = commands.add_parser(
+            'log',
+            #aliases = ['l', 'lo'],
+            description = 'Log related commands'
+            ).add_subparsers( dest='action' )
+
+    addlog = log.add_parser(
+            'add',
             description = 'add a log of a work period',
             #aliases = ['al']
             )
