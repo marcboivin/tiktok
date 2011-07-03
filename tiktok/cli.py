@@ -12,10 +12,15 @@ from tiktok import model
 from tiktok import commands
 
 from lib.resources import TikTakResource
+from lib.textdict import TextDict
 from lib import durations
 from lib.prettyprinter import PrettyPrinter
 
-CONFIG_FILE = '~/.tiktok/config.cfg'
+CONFIG_DIR = os.path.expanduser('~/.tiktok')
+
+CONFIG_FILE = os.path.join( CONFIG_DIR, 'config.cfg' )
+PROJECT_CACHE = os.path.join( CONFIG_DIR, 'projects.txt' )
+USER_CACHE = os.path.join( CONFIG_DIR, 'users.txt' )
 
 def load_config( path ):
 
@@ -33,6 +38,8 @@ def load_config( path ):
     config.update( dict( parser.items('general') ) )
     for section in sections:
         config[section] = dict( parser.items( section ) )
+
+    config['config_dir'] = CONFIG_DIR
 
     return config
 
@@ -69,6 +76,17 @@ def initialize( config ):
                 int( config['minutes_in_day'] )
             ),
         }
+
+    projects = TextDict( filename = PROJECT_CACHE )
+    if os.path.exists( PROJECT_CACHE ):
+        projects.load()
+
+    users = TextDict( filename = USER_CACHE )
+    if os.path.exists( USER_CACHE ):
+        users.load()
+
+    model.project.Project.cache = projects
+    model.user.User.cache = users
 
     utils = {
         'resource' : resource,
@@ -187,6 +205,32 @@ def argparser():
             #aliases = ['li']
             )
 
+    #Project
+    project = commands.add_parser(
+            'project',
+            description = 'Project commands',
+            #aliases = ['p']
+            ).add_subparsers( dest = 'action' )
+
+    p_list = project.add_parser(
+            'list',
+            description = 'List of available projects'
+            #aliases = ['li']
+            )
+
+    #User
+    user = commands.add_parser(
+            'user',
+            description = 'User commands',
+            #aliases = ['u']
+            ).add_subparsers( dest = 'action' )
+
+    u_list = user.add_parser(
+            'list',
+            description = 'List of available users'
+            #aliases = ['li']
+            )
+
     return parser
 
 def error(message):
@@ -224,6 +268,9 @@ def main():
     initialize( config )
 
     dispatch( command, action, args, config )
+
+    model.project.Project.cache.save()
+    model.user.User.cache.save()
 
 if __name__ == '__main__':
     main()
