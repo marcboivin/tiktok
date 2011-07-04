@@ -88,12 +88,20 @@ def initialize( config ):
     model.project.Project.cache = projects
     model.user.User.cache = users
 
+    #You will never know at what point I HATE task properties
+    task_properties = zip(
+        [ int( x ) for x in config['task']['property_ids'].split(',') ],
+        [ int( x ) for x in config['task']['property_values'].split(',') ]
+    )
+
     utils = {
         'resource' : resource,
         'duration_parser' : d_config['parser'],
         'duration_formatter' : d_config['formatter'],
         'datetime_format' : config['datetime_format'],
+        'date_format' : config['date_format'],
         'printer' : PrettyPrinter( d_config['formatter'], config['datetime_format'] ),
+        'task_properties' : task_properties
     }
 
     model.basemodel.set_utils( utils )
@@ -172,11 +180,25 @@ def argparser():
             description = 'add a log of a work period',
             #aliases = ['al']
             )
-    addlog.add_argument( 'tasknum')
-    addlog.add_argument( 'start' )
+    addlog.add_argument( 'tasknum' )
+    addlog.add_argument( '--start', '-s', dest = 'start', required = True )
     addlog.add_argument( '--end', '-e', dest ='end', default = argparse.SUPPRESS )
     addlog.add_argument( '--duration', '-d', dest = 'duration', default = argparse.SUPPRESS )
     addlog.add_argument( '--log', '-l', dest = 'log', default = argparse.SUPPRESS )
+
+    create = task.add_parser(
+            'create',
+            description = 'create a new task'
+            #aliases = ['cr']
+        )
+    create.add_argument( '--name', '-n', dest = 'name', required = True )
+    create.add_argument( '--project', '-p', dest = 'project', required = True )
+    create.add_argument( '--description', '-d', dest = 'description', default = argparse.SUPPRESS )
+    create.add_argument( '--estimate', '-e', dest = 'duration', default = argparse.SUPPRESS )
+    create.add_argument( '--duedate', '-D', dest = 'due_at', default = argparse.SUPPRESS )
+    create.add_argument( '--users', '-u', dest = 'users', nargs = '+', default = argparse.SUPPRESS )
+    create.add_argument( '--start', '-s', dest = 'start', action = 'store_const', const = True, default = False )
+    create.add_argument( '--interactive', '-i', dest = 'interactive', action = 'store_const', const = True, default = False )
 
     cancel = task.add_parser(
             'cancel',
