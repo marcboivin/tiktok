@@ -2,6 +2,9 @@ import restkit
 import cookiefilter
 import cookielib
 import json
+import uuid
+
+from restkit.util import url_quote, to_bytestring
 
 routes = {
     'login_redirect' : '/login/login',
@@ -9,6 +12,19 @@ routes = {
     'logout'    : '/login/logout',
     'dashboard' : '/activities/list',
 }
+
+def form_encode(obj, charset="utf8"):
+
+    if hasattr( obj, 'items' ):
+        obj = obj.items()
+
+    lines = [
+        ( u"%s=%s" %
+            ( url_quote(key), url_quote(value) )
+        ).encode( charset ) for
+            (key, value) in obj
+    ]
+    return to_bytestring( "&".join( lines ) )
 
 class LoginError( Exception ):
 
@@ -45,6 +61,20 @@ class TikTakResource( restkit.Resource ):
 
         self.get( routes['logout'], data )
 
+    def request( self, method, path, payload=None, headers=None, params_dict=None, **params ):
+
+        #HACK: restkit accepts dict payloads but not lists although
+        #the code in client and wrappers would work (go figure)
+        #TODO: submit a patch with my form_encode function
+        if isinstance( payload, list ):
+            payload = form_encode( payload )
+            headers = headers or {}
+            headers.update({
+                'Content-Type' : 'application/x-www-form-urlencoded; charset=utf-8',
+                'Content-Length' : len( payload )
+                })
+
+        return restkit.Resource.request( self, method, path, payload, headers, params_dict, **params )
 
     def json_request(self, method, path, payload=None, headers=None, params_dict=None, **params):
         resp = self.request(method, path, payload, headers, params_dict, **params)
