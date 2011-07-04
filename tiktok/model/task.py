@@ -3,6 +3,8 @@ import datetime
 from basemodel import BaseModel, resourcemethod
 from tiktok.lib.durations import secs_to_timedelta
 
+import urllib
+
 class Task( BaseModel ):
 
     routes = {
@@ -10,6 +12,7 @@ class Task( BaseModel ):
         'start' : '/tasks/start_work_ajax/%(task_id)d',
         'stop' : '/tasks/stop_work_ajax',
         'current' : '/tasks/update_sheet_info.json',
+        'create' : '/tasks/create.json',
         'updatelog' : '/tasks/updatelog.json',
         'addlog' : '/tasks/add_log/%(task_id)d.json',
         'savelog' : '/tasks/save_log/%(worklog_id)d.json',
@@ -70,6 +73,48 @@ class Task( BaseModel ):
         resource = kwargs['resource']
 
         resource.post( cls.routes['cancellog'] )
+
+    @resourcemethod
+    def create( cls, **kwargs ):
+
+        resource = kwargs['resource']
+        duration_formatter  = kwargs['duration_formatter']
+        date_format = kwargs['date_format']
+
+        data = [
+            ( 'name' , kwargs['name'] ),
+            ( 'description', kwargs.get('description', '') ),
+            ( 'project_id', kwargs['project_id'] ),
+            ( 'status', 0 ),
+        ]
+
+        #Ugh, I HATE task properties
+        for (property_id, property_value) in kwargs['task_properties']:
+            data.append( ( 'properties[%d]' % property_id, property_value ) )
+
+        if 'duration' in kwargs:
+            data.append(
+                ( 'duration', duration_formatter.format( kwargs['duration'] ) )
+            )
+        if 'due_at' in kwargs:
+            data.append(
+                ( 'due_at', datetime.datetime.strftime( kwargs['due_at'], date_format ) )
+            )
+
+        data = [ ('task[%s]' % key, value) for (key, value) in data ]
+
+        for user_id in kwargs['user_ids']:
+            data.extend( [
+                ('users[]', user_id),
+                ('assigned[]', user_id),
+                ('notify[]', user_id),
+            ] )
+
+        newtask = resource.postjson( cls.routes['create'], data )
+        newtask = newtask['task']
+
+        return cls( newtask, **kwargs )
+
 
     def addlog( self, **kwargs ):
         """
