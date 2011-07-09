@@ -198,7 +198,19 @@ def argparser():
     create.add_argument( '--duedate', '-D', dest = 'due_at', default = argparse.SUPPRESS )
     create.add_argument( '--users', '-u', dest = 'users', nargs = '+', default = argparse.SUPPRESS )
     create.add_argument( '--start', '-s', dest = 'start', action = 'store_const', const = True, default = False )
-    create.add_argument( '--interactive', '-i', dest = 'interactive', action = 'store_const', const = True, default = False )
+
+    interactive = task.add_parser(
+            'interactive',
+            description = 'create a task interactively'
+            #aliases = ['in']
+        )
+    interactive.add_argument( '--name', '-n', dest = 'name', default = argparse.SUPPRESS )
+    interactive.add_argument( '--project', '-p', dest = 'project', default = argparse.SUPPRESS )
+    interactive.add_argument( '--description', '-d', dest = 'description', default = argparse.SUPPRESS )
+    interactive.add_argument( '--estimate', '-e', dest = 'duration', default = argparse.SUPPRESS )
+    interactive.add_argument( '--duedate', '-D', dest = 'due_at', default = argparse.SUPPRESS )
+    interactive.add_argument( '--users', '-u', dest = 'users', nargs = '+', default = argparse.SUPPRESS )
+    interactive.add_argument( '--start', '-s', dest = 'start', action = 'store_const', const = True, default = False )
 
     cancel = task.add_parser(
             'cancel',
