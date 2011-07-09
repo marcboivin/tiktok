@@ -1,4 +1,3 @@
-
 from basemodel import BaseModel
 
 class CacheModel( BaseModel ):
@@ -21,8 +20,8 @@ class CacheModel( BaseModel ):
         if not hasattr( cls, 'cache' ):
             return []
 
-        term = tern.lower()
-        elements = dict( ( key, value.lower() ) for e in cls.cache.items() )
-        found = [ ( key, cls.cache[key] ) for (key, value) in elements.items() if value.contains( name ) ]
+        term = term.lower()
+        elements = dict( ( key, value.lower() ) for ( key, value ) in cls.cache.items() )
+        found = [ ( key, cls.cache[key] ) for (key, value) in elements.items() if value.find( term ) > -1 ]
         return found
 
