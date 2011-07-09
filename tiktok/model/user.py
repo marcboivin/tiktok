@@ -31,9 +31,6 @@ class User( CacheModel ):
 
         if len( results ) == 0:
             cls.list()
-            results = cls.search( name )
+            results = cls.search( username )
 
-        if len( results ) > 1:
-            raise ValueError("More than one user with the same username")
-
-        return results[0][1]
+        return [ r[0] for r in results ]
