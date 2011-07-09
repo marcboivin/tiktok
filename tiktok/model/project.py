@@ -34,8 +34,5 @@ class Project( CacheModel ):
             cls.list()
             results = cls.search( name )
 
-        if len( results ) > 1:
-            raise ValueError("More than one project with the same name")
-
-        return results[0][1]
+        return [ r[0] for r in results ]
 
