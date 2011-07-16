@@ -45,6 +45,7 @@ class Task( BaseModel ):
             data['sheet_id'] = data.pop('id')
             data['id'] = data.pop('task_id')
             data['name'] = data.pop('task_name')
+            data['duration'] = data.pop('duration') / 60
             task = cls( data, **kwargs )
 
         return task
