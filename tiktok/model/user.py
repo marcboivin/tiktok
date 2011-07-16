@@ -11,13 +11,13 @@ class User( CacheModel ):
         CacheModel.__init__( self, *args, **kwargs )
 
     @resourcemethod
-    def list( cls, **kwargs ):
-        resource = kwargs['resource']
+    def list( cls, context ):
+        resource = context.resource
 
         data = resource.getjson( cls.routes['list'] )
 
         users = [
-            cls( u['user'], **kwargs ) for u in data
+            cls( u['user'], context ) for u in data
         ]
 
         cls.update_cache( users, 'id', 'username' )
@@ -25,7 +25,7 @@ class User( CacheModel ):
         return users
 
     @resourcemethod
-    def find_id_by_username( cls, username, **kwargs ):
+    def find_id_by_username( cls, context, username ):
 
         results = cls.search( username )
 
