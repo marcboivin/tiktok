@@ -18,7 +18,7 @@ class Log( BaseModel ):
         del self['scm_changeset_id']
 
     @resourcemethod
-    def add( cls, task_id, **kwargs ):
+    def add( cls, context, task_id, **kwargs ):
         """
         kwargs:
             start : datetime, when work started
@@ -26,14 +26,12 @@ class Log( BaseModel ):
             end : datetime, when work stopped
             log : commentary (description) of the work period
         """
-        resource = kwargs['resource']
-        datetime_format = kwargs['datetime_format']
-        formatter = kwargs['duration_formatter']
+        resource = context.resource
 
         data = {
-            'started_at' : kwargs['start'].strftime( datetime_format ),
+            'started_at' : context.datetime.format( kwargs['start'] ),
             'body' : kwargs.get('log', ''),
-            'duration' : formatter.format( kwargs['duration'] ),
+            'duration' : context.duration.format( kwargs['duration'] ),
         }
 
         data = dict( ('work_log[%s]' % key, value) for ( key, value ) in data.items() )
@@ -45,4 +43,4 @@ class Log( BaseModel ):
         )
 
         newlog = newlog['work_log']
-        return cls( newlog, **kwargs )
+        return cls( newlog, context )

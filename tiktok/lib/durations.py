@@ -278,6 +278,15 @@ class CompactFormat( StandardFormat ):
     template = format_template['compact']
 
 
+sets = {
+    'alarmclock' : (ClockParser, ClockFormat),
+    'decimal' : (DecimalParser, DecimalFormat),
+    'standard' : (StandardParser, StandardFormat),
+    'compact' : (CompactParser, CompactFormat),
+    'colons' : (ColonParser, ColonFormat)
+}
+
+
 if __name__ == '__main__':
 
     #Parser tests

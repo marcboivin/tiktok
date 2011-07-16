@@ -12,13 +12,13 @@ class Project( CacheModel ):
         CacheModel.__init__( self, *args, **kwargs )
 
     @resourcemethod
-    def list( cls, **kwargs ):
+    def list( cls, context ):
 
-        resource = kwargs['resource']
+        resource = context.resource
         data = resource.getjson( cls.routes['list'] )
 
         projects = [
-            cls( p['project'], **kwargs ) for p in data
+            cls( p['project'], context ) for p in data
         ]
 
         cls.update_cache( projects, 'id', 'name' )
@@ -26,7 +26,7 @@ class Project( CacheModel ):
         return projects
 
     @resourcemethod
-    def find_id_by_name( cls, name, **kwargs ):
+    def find_id_by_name( cls, context, name ):
 
         results = cls.search( name )
 
