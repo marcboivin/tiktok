@@ -6,53 +6,50 @@ import pprint
 import datetime
 import sys
 
-def show( args, config, **kwargs ):
+def show( args, helpers ):
 
     task = Task.get( args['tasknum'] )
     pprint.pprint( task )
 
-def start( args, config, **kwargs ):
+def start( args, helpers ):
 
     task = Task.get( args['tasknum'] )
     task.start()
 
-def updatelog( args, config, **kwargs ):
+def updatelog( args, helpers ):
 
     Task.updatelog( args['description'] )
 
-def stop( args, config, **kwargs ):
+def stop( args, helpers ):
 
     if 'log' in args:
-        updatelog( {'description' :  args['log']}, config )
+        updatelog( {'description' :  args['log']}, helpers )
 
     Task.stop()
 
-def current( args, config, **kwargs ):
+def current( args, helpers ):
 
     task = Task.current()
 
     if task:
-        kwargs['printer'].pprint( task, config['task']['format'] )
+        helpers.pprint( task, helpers.config['task']['format'] )
         print "Description: %s" % task['body']
 
-def cancel( args, config, **kwargs ):
+def cancel( args, helpers ):
 
     Task.cancel()
 
-def create( args, config, **kwargs ):
-
-    duration_parser = kwargs['duration_parser']
-    date_format = config['date_format']
+def create( args, helpers ):
 
     start = args.pop('start')
 
-    creator_id = User.find_id_by_username( config['username'] )
+    creator_id = User.find_id_by_username( helpers.config['username'] )
 
     #Parse duration and date
     if 'duration' in args:
-        args['duration'] = duration_parser.parse( args['duration'] )
+        args['duration'] = helpers.duration.parse( args['duration'] )
     if 'due_at' in args:
-        args['due_at'] = datetime.datetime.strptime( args['due_at'], date_format )
+        args['due_at'] = helpers.date.parse( args['due_at'] )
 
     #Transform project name into project id
     found = Project.find_id_by_name( args.pop( 'project') )
@@ -94,9 +91,9 @@ def create( args, config, **kwargs ):
     if start:
         task.start()
 
-    kwargs['printer'].pprint( task, config['task']['format'] )
+    helpers.pprint( task, helpers.config['task']['format'] )
 
-def interactive( args, config, **kwargs ):
+def interactive( args, helpers ):
 
     formats = {
         'standard' : '1w 2d 3h 4m',
@@ -106,7 +103,7 @@ def interactive( args, config, **kwargs ):
         'decimal' : '12.95',
     }
 
-    d_format = formats[ config['duration_format'] ]
+    d_format = formats[ helpers.config['duration_format'] ]
 
     #Task name
     if 'name' not in args:
@@ -141,7 +138,7 @@ def interactive( args, config, **kwargs ):
             args['duration'] = duration
 
     if 'due_at' not in args:
-        due_at = raw_input( "Due date (%s) (leave blank for nothing): " % config['date_format'] ).strip()
+        due_at = raw_input( "Due date (%s) (leave blank for nothing): " % helpers.config['date_format'] ).strip()
         if due_at != '':
             args['due_at'] = due_at
 
@@ -172,5 +169,5 @@ def interactive( args, config, **kwargs ):
     if start.lower() == 'y':
         args['start'] = True
 
-    create( args, config, **kwargs )
+    create( args, helpers )
 
