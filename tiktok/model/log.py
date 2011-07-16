@@ -1,6 +1,6 @@
-import datetime
-from basemodel import BaseModel, resourcemethod, parse_isoutc
+from basemodel import BaseModel, resourcemethod
 from tiktok.lib.durations import secs_to_timedelta
+from tiktok.lib.datetimes import parse_isoutc
 
 class Log( BaseModel ):
 
