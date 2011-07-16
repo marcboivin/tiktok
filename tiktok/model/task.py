@@ -28,14 +28,14 @@ class Task( BaseModel ):
 
 
     @resourcemethod
-    def get( cls, tasknum, **kwargs ):
-        resource = kwargs['resource']
-
-        return cls( resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task'], **kwargs )
+    def get( cls, context, tasknum ):
+        resource = context.resource
+        data = resource.getjson( cls.routes['get'] % {'tasknum' : tasknum} )['task']
+        return cls( data, context )
 
     @resourcemethod
-    def current( cls, **kwargs ):
-        resource = kwargs['resource']
+    def current( cls, context ):
+        resource = context.resource
 
         task = None
         data = resource.postjson( cls.routes['current'] )
@@ -46,37 +46,33 @@ class Task( BaseModel ):
             data['id'] = data.pop('task_id')
             data['name'] = data.pop('task_name')
             data['duration'] = data.pop('duration') / 60
-            task = cls( data, **kwargs )
+            task = cls( data, context )
 
         return task
 
-    def start(self):
+    def start( self ):
 
         self.resource.post( self.routes['start'] % {'task_id' : self['id'] } )
 
     @resourcemethod
-    def stop( cls, **kwargs ):
-        resource = kwargs['resource']
-
+    def stop( cls, context ):
+        resource = context.resource
         resource.post( cls.routes['stop'] )
 
     @resourcemethod
-    def updatelog( cls, text, **kwargs ):
-        resource = kwargs['resource']
-
+    def updatelog( cls, context, text ):
+        resource = context.resource
         resource.post( cls.routes['updatelog'], {'text' : text} )
 
     @resourcemethod
-    def cancel( cls, **kwargs ):
-        resource = kwargs['resource']
+    def cancel( cls, context ):
+        resource = context.resource
         resource.post( cls.routes['cancel'] )
 
     @resourcemethod
-    def create( cls, **kwargs ):
+    def create( cls, context, **kwargs ):
 
-        resource = kwargs['resource']
-        duration_formatter  = kwargs['duration_formatter']
-        date_format = kwargs['date_format']
+        resource = context.resource
 
         data = [
             ( 'name' , kwargs['name'] ),
@@ -86,16 +82,16 @@ class Task( BaseModel ):
         ]
 
         #Ugh, I HATE task properties
-        for (property_id, property_value) in kwargs['task_properties']:
+        for (property_id, property_value) in context.task_properties:
             data.append( ( 'properties[%d]' % property_id, property_value ) )
 
         if 'duration' in kwargs:
             data.append(
-                ( 'duration', duration_formatter.format( kwargs['duration'] ) )
+                ( 'duration', context.duration.format( kwargs['duration'] ) )
             )
         if 'due_at' in kwargs:
             data.append(
-                ( 'due_at', datetime.datetime.strftime( kwargs['due_at'], date_format ) )
+                ( 'due_at', context.datetime.format( kwargs['due_at'] ) )
             )
 
         data = [ ('task[%s]' % key, value) for (key, value) in data ]
@@ -110,4 +106,4 @@ class Task( BaseModel ):
         newtask = resource.postjson( cls.routes['create'], data )
         newtask = newtask['task']
 
-        return cls( newtask, **kwargs )
+        return cls( newtask, context )
