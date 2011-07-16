@@ -283,11 +283,10 @@ if __name__ == '__main__':
     #Parser tests
     parser = ClockParser()
 
+
     t = parser.parse( "12:34" )
     secs = 12 * HOUR + 34 * MINUTE
     assert total_seconds( t ) == secs
-
-    
 
     parser = DecimalParser()
 
@@ -348,6 +347,9 @@ if __name__ == '__main__':
 
     t = secs_to_timedelta( HOUR * 34 + MINUTE * 56 )
     assert f.format( t ) == "34:56"
+
+    t = secs_to_timedelta( 3 )
+    assert f.format( t ) == "00:00"
 
 
 
