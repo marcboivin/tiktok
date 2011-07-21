@@ -138,6 +138,11 @@ def argparser( configfile ):
             #aliases = ['li']
             )
 
+    w_tasktable = widget.add_parser(
+            'tasktable',
+            description = 'print a parse-friendly list of widgets and their tasks'
+            )
+
     #Project
     project = commands.add_parser(
             'project',
