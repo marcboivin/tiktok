@@ -7,6 +7,11 @@ class PrettyPrinter( object ):
         self.duration_formatter = duration_formatter
         self.datetime_format = datetime_format
 
+    def sanitize_string( self, text ):
+        if isinstance( text, str ):
+            text = str.encode("utf8")
+        return text
+
     def format( self, obj, format ):
 
         data = {}
@@ -19,9 +24,9 @@ class PrettyPrinter( object ):
             else:
                 data[key] = value
 
-        return format % data
+        return self.sanitize_string( format % data )
 
     def pprint( self, obj, format ):
 
-        print self.format( obj, format )
+        print self.format( obj, format ).decode("utf8")
 
