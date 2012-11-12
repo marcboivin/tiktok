@@ -9,7 +9,7 @@ class PrettyPrinter( object ):
 
     def sanitize_string( self, text ):
         if isinstance( text, str ):
-            text = str.encode("utf8")
+            text = text.decode("utf8")
         return text
 
     def format( self, obj, format ):
@@ -28,5 +28,5 @@ class PrettyPrinter( object ):
 
     def pprint( self, obj, format ):
 
-        print self.format( obj, format ).decode("utf8")
+        print self.format( obj, format ).encode("utf8")
 
