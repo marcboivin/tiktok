@@ -92,7 +92,7 @@ class TikTakResource( restkit.Resource ):
     def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
         return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)
 
-class RedmineRessource( reskit.Ressource ):
+class ProjetsRessource( reskit.Ressource ):
     
     routes = {
         'issue' : '/issues/',
