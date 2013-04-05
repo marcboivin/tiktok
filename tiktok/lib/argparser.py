@@ -116,6 +116,13 @@ def argparser( configfile ):
             description = 'cancel the task you are working on right now'
             #aliases = ['cl']
             )
+            
+    search = task.add_parser(
+            'search',
+            description = 'search keyword in the task database'
+            )
+            
+    search.add_argument( '--keyword', '-k', dest = 'keyword', default = argparse.SUPPRESS )
 
     #Widget
     widget_main = commands.add_parser(
@@ -168,7 +175,28 @@ def argparser( configfile ):
             description = 'List of available users'
             #aliases = ['li']
             )
-
+    url = commands.add_parser(
+            'url',
+            description = 'Clock time based on a system URL (Very Libeo specific)',
+            #aliases = ['u']
+            ).add_subparsers( dest = 'action' )
+            
+    clock = url.add_parser(
+            'clock',
+            description = 'List of available users'
+            #aliases = ['li']
+            )
+            
+    clock.add_argument( '--date', '-d', dest = 'date', default = argparse.SUPPRESS )
+    clock.add_argument( '--start_time', '-stt', dest = 'start_time', default = argparse.SUPPRESS )
+    clock.add_argument( '--stop_time', '-spt', dest = 'duration', default = argparse.SUPPRESS )
+    
+    live = url.add_parser(
+            'live',
+            description = 'List of available users'
+            #aliases = ['li']
+            )
+    
     return parser
 
 
