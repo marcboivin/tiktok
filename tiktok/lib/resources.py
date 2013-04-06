@@ -3,6 +3,8 @@ import cookiefilter
 import cookielib
 import json
 import uuid
+import urllib
+import pprint
 
 from restkit.util import url_quote, to_bytestring
 
@@ -12,6 +14,8 @@ routes = {
     'logout'    : '/login/logout',
     'dashboard' : '/activities/list',
 }
+
+restkit.set_logging(10)
 
 def form_encode(obj, charset="utf8"):
 
@@ -92,21 +96,22 @@ class TikTakResource( restkit.Resource ):
     def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
         return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)
 
-class ProjetsRessource( reskit.Ressource ):
+class ProjetsRessource( restkit.Resource ):
     
     routes = {
-        'issue' : '/issues/',
+        'issue' : '/issues',
     }
     
     format = 'json'
-    __init__( self, domain, protocol, username, password, **client_opts ):
-    '''
-        We use the domain and protocol variable, along with the username
-        and password to create a Basic HTTP Auth URL. This should not be
-        deployed for external uses, it's quite unsafe.
-    '''
-    
-        # Construct said URL
+    def __init__( self, domain, protocol, username, password, **client_opts ):
+        '''
+            We use the domain and protocol variable, along with the username
+            and password to create a Basic HTTP Auth URL. This should not be
+            deployed for external uses, it's quite unsafe.
+        '''
+        u = urllib.quote(username)
+        p = urllib.quote(password) 
+        
         uri = protocol + '://' + username + ':' + password + '@' + domain + '/'
         
         restkit.Resource.__init__( self, uri, **client_opts )
@@ -114,38 +119,47 @@ class ProjetsRessource( reskit.Ressource ):
         self.username = username
         self.password = password
         
-        def get_issue( self, issue_id ):
-            # We're using get JSON so please don,t change the format at 
-            # class level
-            self.getjson(self.routes.issue + '/' + issue_id + '.' + slef.format)
+    def get_from_id( self, ID ):
+        '''
+            The get function is the only mandatory function. 
+            The rest (except the init) is up to you.
+        '''
+        return self.get_issue( ID )
+    
+    def get_issue( self, issue_id ):
+        # We're using get JSON so please don,t change the format at 
+        # class level
+        json_return = self.getjson(self.routes['issue'] + '/' + issue_id + '.' + self.format)
+        
+        return json_return
 
-        def request( self, method, path, payload=None, headers=None, params_dict=None, **params ):
+    def request( self, method, path, payload=None, headers=None, params_dict=None, **params ):
 
-            #HACK: restkit accepts dict payloads but not lists although
-            #the code in client and wrappers would work (go figure)
-            #TODO: submit a patch with my form_encode function
-            if isinstance( payload, list ):
-                payload = form_encode( payload )
-                headers = headers or {}
-                headers.update({
-                    'Content-Type' : 'application/x-www-form-urlencoded; charset=utf-8',
-                    'Content-Length' : len( payload )
-                    })
+        #HACK: restkit accepts dict payloads but not lists although
+        #the code in client and wrappers would work (go figure)
+        #TODO: submit a patch with my form_encode function
+        if isinstance( payload, list ):
+            payload = form_encode( payload )
+            headers = headers or {}
+            headers.update({
+                'Content-Type' : 'application/x-www-form-urlencoded; charset=utf-8',
+                'Content-Length' : len( payload )
+                })
 
-            return restkit.Resource.request( self, method, path, payload, headers, params_dict, **params )
+        return restkit.Resource.request( self, method, path, payload, headers, params_dict, **params )
 
-        def json_request(self, method, path, payload=None, headers=None, params_dict=None, **params):
-            resp = self.request(method, path, payload, headers, params_dict, **params)
-            return json.loads( resp.body_string() )
+    def json_request(self, method, path, payload=None, headers=None, params_dict=None, **params):
+        resp = self.request(method, path, payload, headers, params_dict, **params)
+        return json.loads( resp.body_string() )
 
-        def getjson( self, path, payload=None, headers=None, params_dict=None, **params):
-            return self.json_request( 'GET', path, payload, headers, params_dict, **params)
+    def getjson( self, path, payload=None, headers=None, params_dict=None, **params):
+        return self.json_request( 'GET', path, payload, headers, params_dict, **params)
 
-        def postjson( self, path, payload=None, headers=None, params_dict=None, **params):
-            return self.json_request( 'POST', path, payload, headers, params_dict, **params)
+    def postjson( self, path, payload=None, headers=None, params_dict=None, **params):
+        return self.json_request( 'POST', path, payload, headers, params_dict, **params)
 
-        def putjson( self, path, payload=None, headers=None, params_dict=None, **params):
-            return self.json_request( 'PUT', path, payload, headers, params_dict, **params)
+    def putjson( self, path, payload=None, headers=None, params_dict=None, **params):
+        return self.json_request( 'PUT', path, payload, headers, params_dict, **params)
 
-        def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
-            return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)
+    def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
+        return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)

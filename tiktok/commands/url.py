@@ -11,14 +11,11 @@ import sys
 def live( args, helper ):
     pprint.pprint( 'You\'re going to live clock on a url' )
     
-    url = urlparse( args['source_url'] )
-    # Single subdomain implied. Also implied is that this subdomain 
-    # identifies the parser to use
-    system = url.hostname.split( '.' )[0]
-    
-    pprint.pprint( url )
+    url = URL( args['source_url'] )
+    url.live( )
     
     
 def clock( args, helper ):
     pprint.pprint( 'You\'re goint to clock a past task' )
-        
+    url = urlparse( args['source_url'] )
+    url.clock( )    
