@@ -186,16 +186,20 @@ def argparser( configfile ):
             description = 'List of available users'
             #aliases = ['li']
             )
+    
+    clock.add_argument('source_url')
             
     clock.add_argument( '--date', '-d', dest = 'date', default = argparse.SUPPRESS )
     clock.add_argument( '--start_time', '-stt', dest = 'start_time', default = argparse.SUPPRESS )
-    clock.add_argument( '--stop_time', '-spt', dest = 'duration', default = argparse.SUPPRESS )
+    clock.add_argument( '--stop_time', '-spt', dest = 'stop_time', default = argparse.SUPPRESS )
     
     live = url.add_parser(
             'live',
             description = 'List of available users'
             #aliases = ['li']
             )
+            
+    live.add_argument('source_url')
     
     return parser
 
