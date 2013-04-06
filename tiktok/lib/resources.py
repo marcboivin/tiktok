@@ -167,12 +167,13 @@ class ProjetsRessource( restkit.Resource ):
     def get_task_name( self ):
         content = self.get_content( )
         name = self.name + ' #' + self.ID + ' ' + content['issue']['subject']
-        print( name )
         return name
             
     def get_project_id( self ):
         content = self.get_content( )
         project_id = re.search('P-[0-9\-]*', content['issue']['project']['name'])
 
-        print( project_id.group( 0 ) )
-        return False
+        if project_id:
+            project_id = project_id.group( 0 )
+
+        return project_id 
