@@ -1,7 +1,7 @@
 import datetime
 from urlparse import urlparse
 
-from tiktok.model.basemodel import BaseModel
+from tiktok.model import Task
 from tiktok.lib import resources, config
 
 class URL( object ):
