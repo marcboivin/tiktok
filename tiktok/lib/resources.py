@@ -164,9 +164,13 @@ class ProjetsRessource( restkit.Resource ):
     def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
         return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)
 
+    def get_task_id( self ):
+        return self.name + ' #' + self.ID
+
     def get_task_name( self ):
         content = self.get_content( )
-        name = self.name + ' #' + self.ID + ' ' + content['issue']['subject']
+        name = self.get_task_id + ' ' + content['issue']['subject']
+        
         return name
             
     def get_project_id( self ):
