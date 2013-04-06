@@ -14,7 +14,7 @@ class Task( BaseModel ):
         'create' : '/tasks/create.json',
         'updatelog' : '/tasks/updatelog.json',
         'cancel' : '/tasks/cancel_work_ajax',
-        'search' : 'work_logs/task_autocomplete.json',
+        'search' : '/work_logs/task_autocomplete.json',
     }
 
     def __init__(self, *args, **kwargs):
@@ -111,12 +111,12 @@ class Task( BaseModel ):
     
     @resourcemethod   
     def search( cls, context, **kwargs ):
-        ressource = context.ressource
+        ressource = context.resource
         
         data = [
-             ( 'keyword' , kwargs['keyword'] ),
+             ( 'term' , kwargs['keyword'] ),
         ]
         
-        json_response = ressource.getjson( cls.list['search'], data)
+        json_response = ressource.getjson( cls.routes['search'], data)
         
         return json_response

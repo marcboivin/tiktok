@@ -172,4 +172,4 @@ def interactive( args, helpers ):
     create( args, helpers )
 
 def search( args, helpers ):
-    pprint(args)
+    pprint.pprint( Task.search( **args ) )
