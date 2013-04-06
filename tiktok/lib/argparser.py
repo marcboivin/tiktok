@@ -122,7 +122,7 @@ def argparser( configfile ):
             description = 'search keyword in the task database'
             )
             
-    search.add_argument( '--keyword', '-k', dest = 'keyword', default = argparse.SUPPRESS )
+    search.add_argument( 'keyword')
 
     #Widget
     widget_main = commands.add_parser(
