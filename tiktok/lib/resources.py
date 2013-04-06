@@ -5,6 +5,7 @@ import json
 import uuid
 import urllib
 import pprint
+import re
 
 from restkit.util import url_quote, to_bytestring
 
@@ -101,9 +102,12 @@ class ProjetsRessource( restkit.Resource ):
     routes = {
         'issue' : '/issues',
     }
-    
+    # Used to build the task name
+    name = 'RM'
+    content = False
     format = 'json'
-    def __init__( self, domain, protocol, username, password, **client_opts ):
+
+    def __init__( self, domain, protocol, username, password, ID, **client_opts ):
         '''
             We use the domain and protocol variable, along with the username
             and password to create a Basic HTTP Auth URL. This should not be
@@ -118,20 +122,16 @@ class ProjetsRessource( restkit.Resource ):
         
         self.username = username
         self.password = password
-        
-    def get_from_id( self, ID ):
-        '''
-            The get function is the only mandatory function. 
-            The rest (except the init) is up to you.
-        '''
-        return self.get_issue( ID )
+        self.ID = ID
     
-    def get_issue( self, issue_id ):
-        # We're using get JSON so please don,t change the format at 
-        # class level
-        json_return = self.getjson(self.routes['issue'] + '/' + issue_id + '.' + self.format)
+    def get_content( self ):
+        if not self.content:
+            # We're using get JSON so please don,t change the format at 
+            # class level
+            json_return = self.getjson(self.routes['issue'] + '/' + self.ID + '.' + self.format)
+            self.content = json_return
         
-        return json_return
+        return self.content
 
     def request( self, method, path, payload=None, headers=None, params_dict=None, **params ):
 
@@ -163,3 +163,16 @@ class ProjetsRessource( restkit.Resource ):
 
     def deletejson( self, path, payload=None, headers=None, params_dict=None, **params):
         return self.json_request( 'DELETE', path, payload, headers, params_dict, **params)
+
+    def get_task_name( self ):
+        content = self.get_content( )
+        name = self.name + ' #' + self.ID + ' ' + content['issue']['subject']
+        print( name )
+        return name
+            
+    def get_project_id( self ):
+        content = self.get_content( )
+        project_id = re.search('P-[0-9\-]*', content['issue']['project']['name'])
+
+        print( project_id.group( 0 ) )
+        return False

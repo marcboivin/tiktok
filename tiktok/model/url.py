@@ -17,8 +17,9 @@ class URL( object ):
         return False
         
     def live( self ):
-        content = self.fetch_content( )
-        print( content )
+        taskname = self.ressource.get_task_name( )
+        projet = self.ressource.get_project_id( )
+
         return False
         
     def select_ressource( self ):
@@ -27,7 +28,7 @@ class URL( object ):
             pattern.
 
             Single subdomain implied. Also implied is that this subdomain 
-            identifies the parser to use
+            identifies the Ressource to use
         '''
         system = self.url.hostname.split( '.' )[0]
 
@@ -35,14 +36,10 @@ class URL( object ):
         self.selected_ressource =  vars( resources )[ system.capitalize() + 'Ressource' ]
     
     def init_ressource( self ):
-        self.ressource = self.selected_ressource( self.url.hostname, self.url.scheme, config.configs['username'], config.configs['password'] )
-
-    def fetch_content( self ):
         path = self.url.path.split( '/' )
         ID = path[len( path ) - 1]
 
-        return self.ressource.get_from_id( ID )
-        
-    def search_for_project( self, content ):
-        return False
+        self.ressource = self.selected_ressource( self.url.hostname, self.url.scheme, config.configs['username'], config.configs['password'], ID )
+
+
         
