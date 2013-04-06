@@ -13,41 +13,10 @@ from tiktok import commands
 from lib.resources import TikTakResource
 from lib.textdict import TextDict
 from lib.argparser import argparser
-from lib import durations, helpers
+from lib import durations, helpers, config
 
-CONFIG_DIR = os.path.expanduser('~/.tiktok')
-
-CONFIG_FILE = os.path.join( CONFIG_DIR, 'config.cfg' )
-PROJECT_CACHE = os.path.join( CONFIG_DIR, 'projects.txt' )
-USER_CACHE = os.path.join( CONFIG_DIR, 'users.txt' )
-
-def load_config( path ):
-
-    config = {}
-
-    defaults = resource_stream('tiktok.config', 'defaults.cfg')
-    parser = RawConfigParser(allow_no_value = True)
-    parser.readfp( defaults, 'defaults.cfg' )
-
-    if os.path.exists( path ):
-        parser.read( path )
-
-    sections = [ x for x in parser.sections() if x != 'general' ]
-
-    config.update( dict( parser.items('general') ) )
-    for section in sections:
-        config[section] = dict( parser.items( section ) )
-
-    config['config_dir'] = CONFIG_DIR
-
-    task_properties = zip(
-        [ int( x ) for x in config['task']['property_ids'].split(',') ],
-        [ int( x ) for x in config['task']['property_values'].split(',') ]
-    )
-
-    config['task_properties'] = task_properties
-
-    return config
+PROJECT_CACHE = os.path.join( config.CONFIG_DIR, 'projects.txt' )
+USER_CACHE = os.path.join( config.CONFIG_DIR, 'users.txt' )
 
 def initialize( config ):
 
@@ -84,15 +53,15 @@ def error(message):
     sys.exit(1)
 
 def main():
-
-    parser = argparser( CONFIG_FILE )
+    
+    parser = argparser( config.CONFIG_FILE )
     args = vars( parser.parse_args() )
 
     command = args.pop('command')
     action = args.pop('action')
     configfile = os.path.expanduser( args.pop('configfile') )
 
-    config = load_config( configfile )
+    config.configs = config.load_config( configfile )
 
     if not command:
         error("no command found")
@@ -102,15 +71,15 @@ def main():
     required = ['url', 'username', 'password']
     for key in required:
         if key in args:
-            config[key] = args.pop(key)
+            configs[key] = args.pop(key)
 
-    missing = [x for x in required if not config.get(x) ]
+    missing = [x for x in required if not config.configs.get(x) ]
     if len(missing) > 0:
         msg = "Missing arguments : %s\n" % ', '.join(missing)
         msg += "Please add them to the config file or pass them as arguments to the command line\n"
         error(msg)
 
-    initialize( config )
+    initialize( config.configs )
 
     dispatch( command, action, args )
 
