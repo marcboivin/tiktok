@@ -2,6 +2,8 @@ import datetime
 from basemodel import BaseModel, resourcemethod
 from tiktok.lib.durations import secs_to_timedelta
 
+import pdb
+
 import urllib
 
 class Task( BaseModel ):

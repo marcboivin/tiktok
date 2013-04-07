@@ -169,7 +169,7 @@ class ProjetsRessource( restkit.Resource ):
 
     def get_name( self ):
         content = self.get_content( )
-        name = self.get_task_id + ' ' + content['issue']['subject']
+        name = self.get_cit_id( ) + ' ' + content['issue']['subject']
 
         return name
             
