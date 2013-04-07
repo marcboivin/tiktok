@@ -133,6 +133,7 @@ class URL( object ):
         ID = path[len( path ) - 1]
 
         self.ressource = self.selected_ressource( self.url.hostname, self.url.scheme, config.configs['username'], config.configs['password'], ID )
+        
 
 
         
