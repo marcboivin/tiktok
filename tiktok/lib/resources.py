@@ -16,8 +16,6 @@ routes = {
     'dashboard' : '/activities/list',
 }
 
-restkit.set_logging(10)
-
 def form_encode(obj, charset="utf8"):
 
     if hasattr( obj, 'items' ):
@@ -175,9 +173,92 @@ class ProjetsRessource( restkit.Resource ):
             
     def get_project_id( self ):
         content = self.get_content( )
-        project_id = re.search('P-[0-9\-]*', content['issue']['project']['name'])
+        project_id = re.search( 'P-[0-9\-]*', content['issue']['project']['name'] )
 
         if project_id:
             project_id = project_id.group( 0 )
 
         return project_id 
+
+class RtRessource( restkit.Resource ):
+    routes = {
+        'login'     : '',
+        'logout'    : '/NoAuth/Logout.html',
+        'issue'     : '/REST/1.0/ticket/'
+    }
+    name = 'RT'
+    content = False
+    ID = False
+    # Keep the URI in orer to set the referer header
+    uri = False
+    subject = False
+
+    def __init__( self, domain, protocol, username, password, ID, **client_opts ):
+
+        cookiejar = client_opts.pop( 'cookiejar', cookielib.CookieJar() )
+        client_opts.update( {'filters' : [ cookiefilter.CookieFilter( cookiejar ) ] } )
+
+        uri = protocol + '://' + domain
+
+        restkit.Resource.__init__( self, uri, **client_opts )
+
+        self.username = username
+        self.password = password
+        self.ID = ID
+        self.uri = uri
+
+        self.login( )
+
+    def get_content( self ):
+        if not self.content:
+            # We're using get JSON so please don,t change the format at 
+            # class level
+            params = {
+                'format' : 'l'
+            }
+            headers = {
+                'referer' : self.uri
+            }
+            
+            content = self.get( self.routes['issue'] + self.ID + '/history', headers, params )
+            self.content = content.body_string( )
+        
+        return self.content
+
+    def get_subject( self ):
+        if not self.subject:
+
+            content = self.get( self.routes['issue'] + self.ID ).body_string( )
+            self.subject = re.search( '(Subject:)(.*$)', content ).group( 1 ).trim( )
+
+        return self.subject
+
+    def get_cit_id( self ):
+        return self.name + ' #' + self.ID
+
+    def get_name( self ):
+        name = self.get_cit_id( ) + ' ' + self.get_subject( )
+
+        return name
+            
+    def get_project_id( self ):
+        content = self.get_content( )
+        
+        project_id = re.search( 'P-[0-9\-]*', content )
+
+        if project_id:
+            project_id = project_id.group( 0 )
+
+        return project_id 
+
+    def login(self):
+
+        data = {
+            'user' : self.username,
+            'pass' : self.password
+        }
+
+        resp = self.request('POST', self.routes['login'], data )
+
+        if ( 300 < resp.status_int < 400):
+            raise LoginError( self.username )
