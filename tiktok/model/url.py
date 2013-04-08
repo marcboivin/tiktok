@@ -56,8 +56,7 @@ class URL( object ):
                         print( 'Found the project in CIT (ID ' + project_cit + '), creating task...' )
                         # Mostly copied code from the command.task. Not DRY but it didn't work the 
                         # way I wanted RMEMBER IT'S A PROTOTYPE
-                        import pdb
-                        pdb.set_trace( )
+
                         data = {
                             'name' : self.ressource.get_name( ),
                             'project': project_cit,
@@ -129,11 +128,18 @@ class URL( object ):
         self.selected_ressource =  vars( resources )[ system.capitalize() + 'Ressource' ]
     
     def init_ressource( self ):
+        ID = False
         path = self.url.path.split( '/' )
-        ID = path[len( path ) - 1]
+        # Better to search for numbers then assume the position in the URL
+        ID = re.search( '[0-9]+', self.url.path )
+        if not ID:
+            ID = re.search( '[0-9]+', self.url.query )
+
+        if ID:
+            ID = ID.group( 0 )
 
         self.ressource = self.selected_ressource( self.url.hostname, self.url.scheme, config.configs['username'], config.configs['password'], ID )
-        
+
 
 
         
