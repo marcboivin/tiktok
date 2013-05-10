@@ -219,7 +219,7 @@ class RtRessource( restkit.Resource ):
             headers = {
                 'referer' : self.uri
             }
-            
+
             content = self.get( self.routes['issue'] + self.ID + '/history', headers, params )
             self.content = content.body_string( )
         
@@ -229,7 +229,7 @@ class RtRessource( restkit.Resource ):
         if not self.subject:
 
             content = self.get( self.routes['issue'] + self.ID ).body_string( )
-            self.subject = re.search( '(Subject:)(.*$)', content ).group( 1 ).trim( )
+            self.subject = re.search( '(Subject:)(.*)', content ).group( 1 ).strip( )
 
         return self.subject
 
