@@ -16,6 +16,6 @@ def live( args, helper ):
     
     
 def clock( args, helper ):
-    pprint.pprint( 'You\'re goint to clock a past task' )
+    pprint.pprint( 'You\'re goint to clock a past task NOT IMPLEMENTED YET' )
     url = urlparse( args['source_url'] )
     url.clock( )    
