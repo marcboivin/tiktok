@@ -42,7 +42,7 @@ commands available in a module, or to see a command's parameters, type
 URL Clock
 ---------
 
-This is a beta feature, right now only working with https://projets.libeo.com 
+This is a beta feature, right now only working with https://projets.libeo.com or https://rt.libeo.com
 and only in live mode. Use it like so : 
 
 	tiktok url live https://projets.libeo.com/issues/0000
@@ -51,10 +51,10 @@ It will automatically fetch the project, create the task if it doesn't exist
 and start a live clock on it. 
 
 ToDo : 
-* This feature could support software instead of url right now it's based on the
+* This feature could support software instead of url. Right now it's based on the
 on the subdomain to figure out which app runs on the server. 
 * Clean the code, right now it's a HUGE hack and dirty code.
 * Add RT support. The second app we use at work is RT so I want to add support for it. [DONE]
 * Ask the user for the project number in case we can't find it
 * Figure out the CIT task from the page content, for now we only care about the project
-* Fetch all the projects. Right now we only get the first 200 [STARTED]
+* Fetch all the projects. Right now we only get the first 200 [DONE]
