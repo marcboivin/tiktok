@@ -24,6 +24,7 @@ class URL( object ):
         return False
         
     def live( self ):
+        # Allows you to clock live in the taks IDed by the URL
         project_id = self.ressource.get_project_id( )
         project_cit = False
         answer = ''
@@ -54,9 +55,9 @@ class URL( object ):
 
                 for project in p_list: 
                     if project_id in project['name']:
-                        project_cit = str(project['name'])
+                        project_cit = unicode(project['name'])
 
-                        print( 'Found the project in CIT (ID ' + project_cit + '), creating task...' )
+                        print( u'Found the project in CIT (ID ' + project_cit + u'), creating task...' )
                         # Mostly copied code from the command.task. Not DRY but it didn't work the 
                         # way I wanted it to. REMEMBER IT'S A POC
 
@@ -95,7 +96,7 @@ class URL( object ):
                         break
 
             if not project_cit:
-                print("No CIT project found, do you want me to send an email to cp@libeo.com asking for one?")
+                print("No CIT project found, do you want me to send an email to "+ config.configs['email_to'] + " asking for one?")
                 
                 while not re.match('y|n', answer):
                     answer = raw_input( "[y/N]: " ).strip().lower()
