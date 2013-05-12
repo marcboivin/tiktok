@@ -230,7 +230,7 @@ class RtRessource( restkit.Resource ):
     def get_subject( self ):
         if not self.subject:
 
-            content = self.get( self.routes['issue'] + self.ID ).body_string( )
+            content = self.get_content( )
             self.subject = re.search( '(Subject:)(.*)', content ).group( 1 ).strip( )
 
         return self.subject
@@ -247,8 +247,7 @@ class RtRessource( restkit.Resource ):
         content = self.get_content( )
         
         project_id = re.search( 'P-[0-9\-]*', content )
-        import pdb
-        pdb.set_trace()
+
         if project_id:
             project_id = project_id.group( 0 )
 
@@ -260,7 +259,8 @@ class RtRessource( restkit.Resource ):
             'user' : self.username,
             'pass' : self.password
         }
-
+        # Don't try to figure it out, we need to login twice in order for it to work
+        resp = self.request('POST', self.routes['login'], data )
         resp = self.request('POST', self.routes['login'], data )
 
         if ( 300 < resp.status_int < 400):
