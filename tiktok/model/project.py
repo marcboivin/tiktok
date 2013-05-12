@@ -15,13 +15,21 @@ class Project( CacheModel ):
     def list( cls, context ):
 
         resource = context.resource
-        data = resource.getjson( cls.routes['list'] )
+        # list.json is paginated since we can't know how many 
+        # pages there are, here's - yet another - dirty hack
+        i = 1
+        projects = []
+        while i < 5:
+            data = resource.getjson( cls.routes['list'], {}, {}, {'page':i} )
 
-        projects = [
-            cls( p['project'], context ) for p in data
-        ]
+            projects += [
+                cls( p['project'], context ) for p in data
+            ]
+
+            i += 1
 
         cls.update_cache( projects, 'id', 'name' )
+
 
         return projects
 
