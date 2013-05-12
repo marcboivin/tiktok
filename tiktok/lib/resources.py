@@ -210,20 +210,21 @@ class RtRessource( restkit.Resource ):
         self.login( )
 
     def get_content( self ):
-        # We're using get JSON so please don,t change the format at 
-        # class level
-        params = {
-            'format' : 'l'
-        }
-        headers = {
-            'referer' : self.uri
-        }
+        if not self.content:
+            # We're using get JSON so please don,t change the format at 
+            # class level
+            params = {
+                'format' : 'l'
+            }
+            headers = {
+                'referer' : self.uri
+            }
 
-        # When tied in debug mode, login in again works
-        self.login( )
-        
-        content = self.get( self.routes['issue'] + self.ID + '/history', headers, params )
-        self.content = content.body_string( )
+            # When tied in debug mode, login in again works
+            self.login( )
+            
+            content = self.get( self.routes['issue'] + self.ID + '/history', headers, params )
+            self.content = content.body_string( )
         
         return self.content
 
@@ -231,7 +232,7 @@ class RtRessource( restkit.Resource ):
         if not self.subject:
 
             content = self.get_content( )
-            self.subject = re.search( '(Subject:)(.*)', content ).group( 1 ).strip( )
+            self.subject = re.search( '(Subject:)(.*)', content ).group( 2 ).strip( )
 
         return self.subject
 
