@@ -40,11 +40,25 @@ class URL( object ):
         if search:
             # ToDo : make sur this is correct. Don't know the JSON structure yet
 
+            # This checks if we have a CIT task in the label field of the returned task
+            # Always true caus we have a task
             cit_task = int( re.search( '^#([0-9]*)', search[0]['label'] ).group(1) )
 
             cit_task = Task.get( cit_task )
-            print( 'Found the task...' )
+            print( 'Found the task based on standardized name!' )
         else :
+
+            #content_task is the CIT number from the issue content
+            content_task = self.ressource.get_cit_from_content()
+
+            if content_task :
+                # Try to figure ou the task from the ticket content. 
+                # This is handled by the ressource object
+                cit_task = Task.get(int(content_task))
+                print("Found a the task in ticket content!")
+                # HUGE HUGE HACK 
+                project_id = False
+
             print("No existing task...")
             print("Trying to figure out the project")
 
@@ -95,7 +109,13 @@ class URL( object ):
 
                         break
 
-            if not project_cit:
+        if cit_task:
+            if start:
+                cit_task.start()
+                print( 'Now clocking on your task: ' )
+                print(cit_task['name'])
+
+        if not project_cit and not cit_task:
                 print("No CIT project found, do you want me to send an email to "+ config.configs['email_to'] + " asking for one?")
                 
                 while not re.match('y|n', answer):
@@ -125,11 +145,6 @@ class URL( object ):
                     # ToDo
                 else:
                     print( 'No email sent, you cannot clock your time at the moment, sry mate!')
-        if cit_task:
-            if start:
-                cit_task.start()
-                print( 'Now clocking on your task: ' )
-                print(cit_task['name'])
 
         taskname = self.ressource.get_name( )
 
