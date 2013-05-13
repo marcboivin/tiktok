@@ -180,6 +180,14 @@ class ProjetsRessource( restkit.Resource ):
 
         return project_id 
 
+    def get_cit_from_content(self):
+
+        for field in self.content["issue"]["custom_fields"]:
+            if field["name"] == "CIT" and field["value"] != u"0":
+                return field["value"]
+
+        return False
+
 class RtRessource( restkit.Resource ):
     routes = {
         'login'     : '',
@@ -266,3 +274,5 @@ class RtRessource( restkit.Resource ):
 
         if ( 300 < resp.status_int < 400):
             raise LoginError( self.username )
+    def get_cit_from_content(self):
+        return False
