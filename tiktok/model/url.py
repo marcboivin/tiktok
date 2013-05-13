@@ -55,7 +55,7 @@ class URL( object ):
                 # Try to figure ou the task from the ticket content. 
                 # This is handled by the ressource object
                 cit_task = Task.get(int(content_task))
-                print("Found a the task in ticket content!")
+                print("Found the task in ticket content!")
                 # HUGE HUGE HACK 
                 project_id = False
 
@@ -116,7 +116,8 @@ class URL( object ):
                 print(cit_task['name'])
 
         if not project_cit and not cit_task:
-                print("No CIT project found, do you want me to send an email to "+ config.configs['email_to'] + " asking for one?")
+                print("ERROR: No CIT project found") 
+                print("Do you want me to send an email to "+ config.configs['email_to'] + " asking for one?")
                 
                 while not re.match('y|n', answer):
                     answer = raw_input( "[y/N]: " ).strip().lower()
@@ -124,7 +125,7 @@ class URL( object ):
                         answer = 'n'
 
                 if 'y' in answer:
-                    print( 'Sending an email' )
+                    print( 'Sending email' )
 
                     smtp = smtplib.SMTP()
                     smtp.set_debuglevel(0)
@@ -136,7 +137,7 @@ class URL( object ):
 
                     subj = "Besoin d'une tache CIT"
 
-                    message_text = "Bonjour,\nJe cherche une tache pour clocker\n\n"+ self.ressource.get_cit_id( ) +"\n\nSVP Veuillez indiquer le # du projet sous sa forme P-00000-00 dans le nom du projet sur redmine ou dans le contenu du billet sur RT\n\nMerci pour votre Collaboration\n\nUn humble employer un peu perdu.\n\n" + self.url.geturl()
+                    message_text = "Bonjour,\nJe cherche une tache pour clocker\n\n"+ self.ressource.get_cit_id( ) +"\n\nSVP Veuillez indiquer le # du projet sous sa forme P-00000-00 dans le nom du projet sur redmine ou dans le contenu du billet sur RT\n\nVous pouvez aussi indiquer la tâche dans le champs CIT sur Redmine.\n\nMerci pour votre Collaboration\n\nUn humble employer un peu perdu.\n\n" + self.url.geturl()
 
                     msg = "From: %s\nTo: %s\nSubject: %s\n\n%s" % ( from_addr, to_addr, subj, message_text )
 
