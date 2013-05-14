@@ -181,10 +181,10 @@ class ProjetsRessource( restkit.Resource ):
         return project_id 
 
     def get_cit_from_content(self):
-
-        for field in self.content["issue"]["custom_fields"]:
-            if field["name"] == "CIT" and field["value"] != u"0":
-                return field["value"]
+        if("custom_fields" in self.content["issue"]):
+            for field in self.content["issue"]["custom_fields"]:
+                if field["name"] == "CIT" and field["value"] != u"0":
+                    return field["value"]
 
         return False
 
